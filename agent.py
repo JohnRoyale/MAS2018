@@ -11,31 +11,45 @@ class Person(Agent):
 
 
 	# actions
+	def evaluateKB(self):
 
-	#move action
+
+	def updateKB(self):
+
+
+
+	# move action
 	def move(self):
+		corridors = model.corridors[position]
+		selected = random.int(len(corridors))
+		self.position = selected
 
 
-	#optional action (kill, flee, stay)
+	# optional action (kill, flee, stay)
 	def flee(self):
+		self.move()
 
-
-	def kill(self):
-
+	def kill(self, target):
+		victim = target[0];
+		victim.alive = False
+		for agent in room:
+			target.add(agent)
+			agent.murderer.add(self)
 
 	def stay(self):
 		pass
 
 
+
 	def step(self):
 		if(self.alive):
 			if(murderer in room):
-				flee(random connect room)
+				self.flee(random connect room)
 			elif(target in room):
-				kill([target])
+				self.kill(self.target)
 			else:
-				stay()
+				self.stay()
 
-			evaluateKB()
-			updateKB()
-			move()
+			self.evaluateKB()
+			self.updateKB()
+			
