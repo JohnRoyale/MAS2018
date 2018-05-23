@@ -51,6 +51,28 @@ class WiseMenWithHat:
         # This announcement implies that third men has be the one, who wears a red hat
         self.knowledge_base.append(Box_a('3', Atom('3:R')))
 
+class TheShipThreeAgents:
+    """
+    Class models the Kripke structure of the The Ship for three agents (somewhat trivial).
+    """
+    # The knowledge_base is as of yet unused for this class
+    knowledge_base = []
+
+    def __init__(self):
+        # There are only two possible configurations of killer-targer pairs
+        # Note that world 231, for example, stands for the world where 1 targets 2, 2 targets 3, 3 targets 1
+        worlds = [
+            World('231', {'t12': True, 't23': True, 't31': True}),
+            World('312', {'t13': True, 't21': True, 't32': True}),
+        ]
+        # In the 3-agent case, from each world only the world itself is accessible for each agents
+        relations = {
+            '1': {('231','231'), ('312', '312')},
+            '2': {('231','231'), ('312', '312')},
+            '3': {('231','231'), ('312', '312')}
+        }
+        # Build the Kripke model and store it in ks
+        self.ks = KripkeStructure(worlds, relations)
 
 def add_symmetric_edges(relations):
     """Routine adds symmetric edges to Kripke frame

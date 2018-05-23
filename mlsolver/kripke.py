@@ -76,6 +76,21 @@ class KripkeStructure:
                 nodes_not_follow_formula.append(nodes.name)
         return nodes_not_follow_formula
 
+    def print(self):
+        print("Worlds: ")
+        print("=======================")
+
+        for w in self.worlds:
+            print(str(w))
+
+        print()
+        print("Relations: ")
+        print("=======================")
+        for r in self.relations:
+            print(r, ": ", self.relations[r])
+
+        print()
+
     def __eq__(self, other):
         """Returns true iff two Kripke structures are equivalent
         """
