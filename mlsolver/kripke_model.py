@@ -3,7 +3,7 @@
 Module contains data model for three wise men puzzle as Kripke strukture and agents announcements as modal logic
 formulas
 """
-
+from itertools import permutations, combinations
 from mlsolver.kripke import KripkeStructure, World
 from mlsolver.formula import Atom, And, Not, Or, Box_a, Box_star
 
@@ -73,6 +73,58 @@ class TheShipThreeAgents:
         }
         # Build the Kripke model and store it in ks
         self.ks = KripkeStructure(worlds, relations)
+
+class TheShipNAgents:
+    # The knowledge_base is as of yet unused for this class
+    knowledge_base = []
+    agents = []
+
+    def __init__(self, n):
+        self.build_agents(n)
+        print("Agents: ", self.agents)
+        worlds = self.build_worlds(n)
+        # In the 3-agent case, from each world only the world itself is accessible for each agents
+        #relations = build_relations()
+
+        #self.ks = KripkeStructure(worlds, relations)
+
+    def build_agents(self, n):
+        for i in range(n):
+            self.agents.append(str(i+1))
+
+    def build_worlds(self, n):
+        worlds = []
+        pair = []
+        agent_pairs = []
+        perms = permutations(self.agents, 2)
+        #worlds = combinations(worlds, n)
+        for p in perms:
+            agent_pairs.append(list(p))
+
+        print(agent_pairs)
+        print()
+
+        worlds = self.combine_agent_pairs(agent_pairs, worlds, pair, n)
+        for w in worlds:
+            print(w)
+
+    def combine_agent_pairs(self, agent_pairs, worlds, pair, n):
+        if n == 0:
+            worlds.append(pair)
+            return worlds
+
+        for a in agent_pairs:
+            if self.is_allowed(pair, a):
+                worlds = self.combine_agent_pairs(agent_pairs, worlds, pair + [a], n-1)
+
+        return worlds
+
+    def is_allowed(self, pair, a):
+        for c in pair:
+            if(c[0] == a[0] or c[1] == a[1]):
+                return False
+
+        return True
 
 def add_symmetric_edges(relations):
     """Routine adds symmetric edges to Kripke frame

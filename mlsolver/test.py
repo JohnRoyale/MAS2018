@@ -1,4 +1,4 @@
-from mlsolver.kripke_model import WiseMenWithHat, TheShipThreeAgents
+from mlsolver.kripke_model import WiseMenWithHat, TheShipThreeAgents, TheShipNAgents
 from mlsolver.formula import *
 
 def test_wmwh():
@@ -34,4 +34,8 @@ def test_ts3():
     ks = ks.solve(f)
     ks.print()
 
-test_ts3()
+def test_tsn():
+    tsn = TheShipNAgents(3)
+
+#test_ts3()
+test_tsn()
