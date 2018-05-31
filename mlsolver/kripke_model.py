@@ -95,31 +95,48 @@ class TheShipNAgents:
 
     def build_worlds(self, n):
         worlds = []
+        worlds_dict = {}
         pair = []
         agent_pairs = []
         perms = permutations(self.agents, 2)
         #worlds = combinations(worlds, n)
         for p in perms:
-            agent_pairs.append(list(p))
+            agent_pairs.append(''.join(list(p)))
 
         print(agent_pairs)
         print()
         worlds = self.combine_agent_pairs(agent_pairs, worlds, pair, n)
+
         for w in worlds:
             print(w)
 
+        for w in worlds:
+            name = ''.join([char[-1] for char in w])
+            worlds_dict[name] = {f: True for f in w}
+
         print("Total amount of worlds: ", len(worlds))
 
-    def combine_agent_pairs(self, agent_pairs, worlds, pair, n):
+        return worlds_dict
+
+    def combine_agent_pairs(self, agent_pairs, worlds, targets, n):
+        """
+        This function recursively builds up all possible worlds.
+
+        :param agent_pairs: the possible killer-target pairs that are still allowed
+        :param worlds: the set of worlds that are already built
+        :param targets: a set of killer-target pairs
+        :param n: how many agents still need to be assigned a target
+        :return: a list of all possible worlds
+        """
         if n == 0:
-            pair = sorted(pair)
-            if pair not in worlds:
-                worlds.append(pair)
+            targets = sorted(targets)
+            if targets not in worlds:
+                worlds.append(targets)
 
             return worlds
 
-        for a in agent_pairs:
-            worlds = self.combine_agent_pairs(self.update_agent_pairs(agent_pairs, a), worlds, pair + [a], n - 1)
+        for pair in agent_pairs:
+            worlds = self.combine_agent_pairs(self.update_agent_pairs(agent_pairs, pair), worlds, targets + [pair], n - 1)
 
         return worlds
 
