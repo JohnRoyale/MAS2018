@@ -3,9 +3,10 @@
 Module contains data model for three wise men puzzle as Kripke strukture and agents announcements as modal logic
 formulas
 """
-from itertools import permutations, combinations
+from itertools import permutations
 from mlsolver.kripke import KripkeStructure, World
 from mlsolver.formula import Atom, And, Not, Or, Box_a, Box_star
+from bisect import bisect_left
 
 
 class WiseMenWithHat:
@@ -103,28 +104,27 @@ class TheShipNAgents:
 
         print(agent_pairs)
         print()
-
         worlds = self.combine_agent_pairs(agent_pairs, worlds, pair, n)
         for w in worlds:
             print(w)
 
+        print("Total amount of worlds: ", len(worlds))
+
     def combine_agent_pairs(self, agent_pairs, worlds, pair, n):
         if n == 0:
-            worlds.append(pair)
+            pair = sorted(pair)
+            if pair not in worlds:
+                worlds.append(pair)
+
             return worlds
 
         for a in agent_pairs:
-            if self.is_allowed(pair, a):
-                worlds = self.combine_agent_pairs(agent_pairs, worlds, pair + [a], n-1)
+            worlds = self.combine_agent_pairs(self.update_agent_pairs(agent_pairs, a), worlds, pair + [a], n - 1)
 
         return worlds
 
-    def is_allowed(self, pair, a):
-        for c in pair:
-            if(c[0] == a[0] or c[1] == a[1]):
-                return False
-
-        return True
+    def update_agent_pairs(self, agent_pairs, a):
+        return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
 
 def add_symmetric_edges(relations):
     """Routine adds symmetric edges to Kripke frame

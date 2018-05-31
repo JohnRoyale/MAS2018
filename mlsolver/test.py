@@ -1,5 +1,6 @@
 from mlsolver.kripke_model import WiseMenWithHat, TheShipThreeAgents, TheShipNAgents
 from mlsolver.formula import *
+import timeit
 
 def test_wmwh():
     wmwh = WiseMenWithHat()
@@ -35,7 +36,10 @@ def test_ts3():
     ks.print()
 
 def test_tsn():
-    tsn = TheShipNAgents(3)
+    start = timeit.default_timer()
+    tsn = TheShipNAgents(6)
+    stop = timeit.default_timer()
+    print("Time needed to build worlds: ", stop - start)
 
 #test_ts3()
 test_tsn()
