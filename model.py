@@ -109,9 +109,11 @@ class ShipModel(Model):
 
     # all agents take a move step
     def move_agents(self):
+
         for agent in self.schedule.agents:
             if (agent.alive):
                 agent.move()
+
 
 
     def step(self):
@@ -119,8 +121,12 @@ class ShipModel(Model):
         print("Dead:", self.dead_agents)
         print("Smart:", self.smart_agents)
         # agents perform action step
+        print("------")
+        print("ACTING:")
         self.schedule.step()
         # agents perform move step
+        print("------")
+        print("MOVING:")
         self.move_agents()
 
         # store which agents are dead and alive, for clarity
@@ -129,6 +135,6 @@ class ShipModel(Model):
                 self.dead_agents.append(agent)
                 self.living_agents.remove(agent)
 
-            if(len(agent.murderers) != 0 and agent not in self.smart_agents):
+            if(agent.alive and len(agent.murderers) != 0 and agent not in self.smart_agents):
                 self.smart_agents.append(agent)
 

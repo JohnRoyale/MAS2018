@@ -24,12 +24,14 @@ class Person(Agent):
         corridors = self.model.corridors[self.position]
         selected = random.randint(0, len(corridors) - 1)
         self.position = corridors[selected]
+        print(self, "moved to room", self.position)
 
     # optional action (kill, flee, stay)
     def flee(self):
         self.move()
     
     def kill(self, target, room):
+        print(self, "stabs", target, "to death in room", str(self.position) + "!")
         # victim agent is now no longer alive; remove him from murderer's target list
         target.alive = False
         self.targets.remove(target)
@@ -42,13 +44,12 @@ class Person(Agent):
 
     # don't take any action
     def stay(self):
-        pass
+        print(self, "stayed in room", self.position)
 
     def step(self):
         if(self.alive):
-
             print("Agent", self.unique_id + 1, "is now acting.")
-            print("Room:", self.position)
+            #print("Room:", self.position)
 
             # get the room that the agent is in
             room = self.model.rooms[self.position]
@@ -65,6 +66,7 @@ class Person(Agent):
 
             self.evaluateKB()
             self.updateKB()
+
 
 
     def __repr__(self):
