@@ -19,10 +19,10 @@ class ShipModel(Model):
             a = Person(i, self)
             self.schedule.add(a)
 
-        construct_graph()
-        init_game()
-        construct_kripke()
-        
+        self.construct_graph()
+        self.init_game()
+        self.construct_kripke()
+
 
     # kripke model functions
     def construct_kripke(self):
@@ -55,29 +55,36 @@ class ShipModel(Model):
     # initialize rooms and targets
     def init_game(self):
         # randomly distribute the agents over the rooms; don't make agent spawn in the same room
-        available_rooms = [i+1 for i in range(len(self.rooms))]
+        available_rooms = [i for i in range(len(self.rooms))]
         for i in range(self.num_agents):
             selected = random.choice(available_rooms)
-            self.rooms[selected].append(self.schedule.agent[selected])
+            self.rooms[selected].append(self.schedule.agents[i])
+            self.schedule.agents[i].position = selected
             available_rooms.remove(selected)
+        print("------------------------------------------------------")
+        print("Filled rooms:")
+        print(self.rooms)
         
         # randomly distribute killing targets among the agents
-        available_targets = [agent for agent in self.schedule.agent]
+        available_targets = [agent for agent in self.schedule.agents]
         for i in range(self.num_agents):
-            selected = random.choice(available_targets)
+            selected_agent = random.choice(available_targets)
             # an agent can't have himself as a target
-            while(self.schedule.agent[selected] != self.schedule.agent[i]):
-                selected = random.choice(available_targets)
-            self.schedule.agent[i].targets.append(self.schedule.agent[selected])
-            available_targets.remove(self.schedule.agent[selected])
-   
-            
+            while(selected_agent == self.schedule.agents[i]):
+                selected_agent = random.choice(available_targets)
+            self.schedule.agents[i].targets.append(selected_agent)
+            available_targets.remove(selected_agent)
+        print("------------------------------------------------------")
+        print("Targets:")
+        for i in range(self.num_agents):
+            print(self.schedule.agents[i], ":", self.schedule.agents[i].targets)
+
             
         
 
     # all agents take a move step
     def move_agents(self):
-        for agent in self.schedule.agent:
+        for agent in self.schedule.agents:
             agent.move()
 
 
