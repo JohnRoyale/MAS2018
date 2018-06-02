@@ -10,6 +10,7 @@ class Person(Agent):
         self.murderers = []
         self.kb = []
 
+
     # actions
     def evaluateKB(self):
         pass
@@ -22,7 +23,7 @@ class Person(Agent):
     def move(self):
         corridors = self.model.corridors[self.position]
         selected = random.randint(0, len(corridors) - 1)
-        self.position = selected
+        self.position = corridors[selected]
 
     # optional action (kill, flee, stay)
     def flee(self):
@@ -35,9 +36,9 @@ class Person(Agent):
         # add observers to new targets; add agent as murderer to observers;
         #don't add self as murderer
         for agent in room:
-            self.targets.add(agent)
-            if(agent != self):
-                agent.murderer.add(self)
+            if (agent != self):
+                self.targets.append(agent)
+                agent.murderers.append(self)
 
     # don't take any action
     def stay(self):
@@ -46,7 +47,8 @@ class Person(Agent):
     def step(self):
         if(self.alive):
 
-            print("Agent ", self.unique_id, "is now moving.")
+            print("Agent", self.unique_id, "is now acting.")
+            print("Position:", self.position)
 
             # get the room that the agent is in
             room = self.model.rooms[self.position]
@@ -63,6 +65,7 @@ class Person(Agent):
 
             self.evaluateKB()
             self.updateKB()
+
 
     def __repr__(self):
         return "Agent " + str(self.unique_id + 1)

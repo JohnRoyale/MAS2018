@@ -84,10 +84,39 @@ class TheShipNAgents:
         self.build_agents(n)
         print("Agents: ", self.agents)
         worlds = self.build_worlds(n)
-        # In the 3-agent case, from each world only the world itself is accessible for each agents
-        #relations = build_relations()
+        kripke_worlds = []
+        print(worlds)
 
-        #self.ks = KripkeStructure(worlds, relations)
+        # create World objects for the Kripke structure
+        for world in worlds:
+            kripke_worlds.append(World(world, worlds[world]))
+
+        # initialize the agent world relations
+        relations = {}
+        for i in range(n):
+            relations[i] = []
+        for world in worlds:
+            for i in range(n):
+                # an agent only has an accessibility relation to a world where their target is the same
+                # find the current agent's target
+                formulas = worlds[world]
+                for formula in formulas:
+                    if(int(formula[0])== i+1):
+                        break
+                # look for other worlds where the agent has the same target
+                for other_world in worlds:
+                    if(formula in worlds[other_world]):
+                        relations[i].append((world,other_world))
+
+
+        for r in relations:
+            relations[r] = set(relations[r])
+        print("Relations:")
+        print(relations)
+        self.ks = KripkeStructure(kripke_worlds, relations)
+        #f = Box_a('0', Atom('24'))
+        #print("(M,3142) |= K_1 24: ", f.semantic(self.ks, '3142'))
+        #print()
 
     def build_agents(self, n):
         for i in range(n):
@@ -107,8 +136,8 @@ class TheShipNAgents:
         print()
         worlds = self.combine_agent_pairs(agent_pairs, worlds, pair, n)
 
-        for w in worlds:
-            print(w)
+        #for w in worlds:
+            #print(w)
 
         for w in worlds:
             name = ''.join([char[-1] for char in w])

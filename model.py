@@ -1,6 +1,7 @@
 from mesa import Model
 from mesa.time import RandomActivation
 from agent import Person
+from mlsolver.kripke_model import TheShipNAgents
 import random
 
 
@@ -15,18 +16,24 @@ class ShipModel(Model):
         # the corridors determine the connections between the rooms
         self.corridors = {}
 
+
+
         for i in range(self.num_agents):
             a = Person(i, self)
             self.schedule.add(a)
 
+        self.dead_agents = []
+        self.living_agents = list(self.schedule.agents)
+
+        self.construct_kripke(N)
         self.construct_graph()
         self.init_game()
-        self.construct_kripke()
+
 
 
     # kripke model functions
-    def construct_kripke(self):
-        pass
+    def construct_kripke(self, N):
+        self.kripke_model = TheShipNAgents(N)
 
 
     # construct the graph, containing the rooms and their connections
@@ -38,19 +45,19 @@ class ShipModel(Model):
             self.rooms.append([])
         
         # establish the room connections
-        self.corridors[1] = [3]
-        self.corridors[2] = [3, 5]
-        self.corridors[3] = [1, 2, 4, 6]
-        self.corridors[4] = [3, 7]
-        self.corridors[5] = [2, 6, 8, 12]
-        self.corridors[6] = [3, 5, 7, 9]
-        self.corridors[7] = [4, 6, 10, 13] 
-        self.corridors[8] = [5, 9]
-        self.corridors[9] = [6, 8, 10, 11]
-        self.corridors[10] = [7, 9]
-        self.corridors[11] = [9]
-        self.corridors[12] = [5]
-        self.corridors[13] = [7]          
+        self.corridors[0] = [2]
+        self.corridors[1] = [2, 4]
+        self.corridors[2] = [0, 1, 3, 5]
+        self.corridors[3] = [2, 6]
+        self.corridors[4] = [1, 5, 7, 11]
+        self.corridors[5] = [2, 4, 6, 8]
+        self.corridors[6] = [3, 5, 9, 12]
+        self.corridors[7] = [4, 8]
+        self.corridors[8] = [5, 7, 9, 10]
+        self.corridors[9] = [6, 8]
+        self.corridors[10] = [8]
+        self.corridors[11] = [4]
+        self.corridors[12] = [6]
        
     # initialize rooms and targets
     def init_game(self):
@@ -66,7 +73,7 @@ class ShipModel(Model):
         print(self.rooms)
         
         # randomly distribute killing targets among the agents
-        available_targets = [agent for agent in self.schedule.agents]
+        """available_targets = [agent for agent in self.schedule.agents]
         for i in range(self.num_agents):
             selected_agent = random.choice(available_targets)
             # an agent can't have himself as a target
@@ -74,12 +81,31 @@ class ShipModel(Model):
                 selected_agent = random.choice(available_targets)
             self.schedule.agents[i].targets.append(selected_agent)
             available_targets.remove(selected_agent)
+
         print("------------------------------------------------------")
         print("Targets:")
         for i in range(self.num_agents):
             print(self.schedule.agents[i], ":", self.schedule.agents[i].targets)
+        print("------------------------------------------------------")
+        """
 
-            
+        # assign targets based on agent knowledge
+        # take the first world to be the real world
+        print("------------------------------------------------------")
+        world = self.kripke_model.ks.worlds[0]
+        print("Real world:",world)
+        for i in range(self.num_agents):
+            for formula in world.assignment:
+                if( int(formula[0]) == i+1 ):
+                    self.schedule.agents[i].targets.append(self.schedule.agents[int(formula[1]) - 1])
+                    break
+        print("Targets:")
+        for i in range(self.num_agents):
+            print(self.schedule.agents[i], ":", self.schedule.agents[i].targets)
+
+        print("------------------------------------------------------")
+
+
         
 
     # all agents take a move step
@@ -89,7 +115,15 @@ class ShipModel(Model):
 
 
     def step(self):
+        print("Living:", self.living_agents)
+        print("Dead:", self.dead_agents)
         # agents perform action step
         self.schedule.step()
         # agents perform move step
         self.move_agents()
+
+        # store which agents are dead and alive, for clarity
+        for agent in self.schedule.agents:
+            if(not(agent.alive) and not(agent in self.dead_agents)):
+                self.dead_agents.append(agent)
+                self.living_agents.remove(agent)
