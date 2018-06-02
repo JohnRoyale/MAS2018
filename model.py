@@ -16,14 +16,13 @@ class ShipModel(Model):
         # the corridors determine the connections between the rooms
         self.corridors = {}
 
-
-
         for i in range(self.num_agents):
             a = Person(i, self)
             self.schedule.add(a)
 
         self.dead_agents = []
         self.living_agents = list(self.schedule.agents)
+        self.smart_agents = []
 
         self.construct_kripke(N)
         self.construct_graph()
@@ -111,12 +110,14 @@ class ShipModel(Model):
     # all agents take a move step
     def move_agents(self):
         for agent in self.schedule.agents:
-            agent.move()
+            if (agent.alive):
+                agent.move()
 
 
     def step(self):
         print("Living:", self.living_agents)
         print("Dead:", self.dead_agents)
+        print("Smart:", self.smart_agents)
         # agents perform action step
         self.schedule.step()
         # agents perform move step
@@ -124,6 +125,10 @@ class ShipModel(Model):
 
         # store which agents are dead and alive, for clarity
         for agent in self.schedule.agents:
-            if(not(agent.alive) and not(agent in self.dead_agents)):
+            if(agent.alive == False and agent not in self.dead_agents):
                 self.dead_agents.append(agent)
                 self.living_agents.remove(agent)
+
+            if(len(agent.murderers) != 0 and agent not in self.smart_agents):
+                self.smart_agents.append(agent)
+

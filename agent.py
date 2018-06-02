@@ -48,8 +48,8 @@ class Person(Agent):
         if(self.alive):
 
             print("Agent", self.unique_id, "is now acting.")
-            print("Position:", self.position)
-
+            print("Room:", self.position)
+            
             # get the room that the agent is in
             room = self.model.rooms[self.position]
             # if the agent is in the same room with any of its murderers, the agent flees
