@@ -47,9 +47,9 @@ class Person(Agent):
     def step(self):
         if(self.alive):
 
-            print("Agent", self.unique_id, "is now acting.")
+            print("Agent", self.unique_id + 1, "is now acting.")
             print("Room:", self.position)
-            
+
             # get the room that the agent is in
             room = self.model.rooms[self.position]
             # if the agent is in the same room with any of its murderers, the agent flees
