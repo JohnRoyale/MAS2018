@@ -26,6 +26,10 @@ class Person(Agent):
         self.position = corridors[selected]
         print(self, "moved to room", self.position)
 
+        # update the rooms
+        self.model.update_rooms()
+
+
     # optional action (kill, flee, stay)
     def flee(self):
         self.move()
@@ -34,11 +38,13 @@ class Person(Agent):
         print(self, "stabs", target, "to death in room", str(self.position) + "!")
         # victim agent is now no longer alive; remove him from murderer's target list
         target.alive = False
+
         self.targets.remove(target)
+
         # add observers to new targets; add agent as murderer to observers;
         #don't add self as murderer
         for agent in room:
-            if (agent != self):
+            if (agent != self and agent != target):
                 self.targets.append(agent)
                 agent.murderers.append(self)
 

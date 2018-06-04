@@ -15,6 +15,8 @@ class ShipModel(Model):
         self.rooms = []
         # the corridors determine the connections between the rooms
         self.corridors = {}
+        # amount of rooms
+        self.N_rooms = 13
 
         for i in range(self.num_agents):
             a = Person(i, self)
@@ -37,10 +39,8 @@ class ShipModel(Model):
 
     # construct the graph, containing the rooms and their connections
     def construct_graph(self):
-        N_rooms = 13
-        
         # create N amount of rooms
-        for i in range(N_rooms):
+        for i in range(self.N_rooms):
             self.rooms.append([])
         
         # establish the room connections
@@ -115,8 +115,23 @@ class ShipModel(Model):
                 agent.move()
 
 
+    # update the position of agents in the rooms
+    def update_rooms(self):
+        #reset rooms
+        self.rooms = []
+        for i in range(self.N_rooms):
+            self.rooms.append([])
+        for i in range(self.num_agents):
+            position = self.schedule.agents[i].position
+            self.rooms[position].append(self.schedule.agents[i])
+
+
+
+
 
     def step(self):
+        # print("ROOMS:", self.rooms)
+        # print()
         print("Living:", self.living_agents)
         print("Dead:", self.dead_agents)
         print("Smart:", self.smart_agents)
