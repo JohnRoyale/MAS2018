@@ -37,7 +37,7 @@ def test_ts3():
 
 def test_tsn():
     start = timeit.default_timer()
-    tsn = TheShipNAgents(3)
+    tsn = TheShipNAgents(4)
     stop = timeit.default_timer()
     print("\nTime needed to build worlds: ", stop - start)
 
@@ -47,5 +47,5 @@ def test_tsn():
     print("(M,312) |= K_1 t13: ", f.semantic(ks, '312'))
     print()
 
-#test_ts3()
-test_tsn()
+test_ts3()
+#test_tsn()

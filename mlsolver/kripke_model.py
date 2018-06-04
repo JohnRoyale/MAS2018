@@ -3,7 +3,7 @@
 Module contains data model for three wise men puzzle as Kripke strukture and agents announcements as modal logic
 formulas
 """
-from itertools import permutations, product
+from itertools import permutations
 from mlsolver.kripke import KripkeStructure, World
 from mlsolver.formula import Atom, And, Not, Or, Box_a, Box_star
 from bisect import bisect_left
@@ -83,49 +83,95 @@ class TheShipNAgents:
     def __init__(self, n):
         self.build_agents(n)
         print("Agents: ", self.agents)
-        worlds, relations = self.build_model(n)
-        # In the 3-agent case, from each world only the world itself is accessible for each agents
-        relations = self.build_relations(worlds)
+        worlds, propositions = self.build_worlds(n)
+        print("Worlds:", worlds)
 
-        self.ks = KripkeStructure(worlds, relations)
+        kripke_worlds = []
 
-        print("\nWorlds: ")
-        print("---------------------------------------")
-        print(self.ks.worlds)
-        print("\nRelations: ")
-        print("---------------------------------------")
+        self.propositions = propositions
+        print("Propositions:", propositions)
+        print()
+
+        # create World objects for the Kripke structure
+        for world in worlds:
+            kripke_worlds.append(World(world, worlds[world]))
+
+        # initialize the agent world relations
+        relations = {}
+        for i in range(n):
+            id = str(i)
+            relations[id] = []
+        for world in worlds:
+            for i in range(n):
+                id = str(i)
+                # an agent only has an accessibility relation to a world where their target is the same
+                # find the current agent's target
+                formulas = worlds[world]
+                for formula in formulas:
+                    if(formula[0]) == str(i+1):
+                        break
+                # look for other worlds where the agent has the same target
+                for other_world in worlds:
+                    if(formula in worlds[other_world]):
+                        relations[id].append((world,other_world))
+
+
+        for r in relations:
+            relations[r] = set(relations[r])
+        print("Relations:")
+        self.ks = KripkeStructure(kripke_worlds, relations)
         print(self.ks.relations)
+        f = Box_a('2', Atom('23'))
+        #print("(M,231) |= K_1 12: ", f.semantic(self.ks, '312'))
+        #print()
 
     def build_agents(self, n):
         for i in range(n):
             self.agents.append(str(i+1))
 
-    def build_model(self, n):
-        worlds = []
-        world_names = []
-        world_objects = []
+    # if proposition is true for an agent in all worlds accessible
+    # from the real world, add it to the agent's knowledge base
+    def add_knowledge(self, agent, world, proposition):
+        f = Box_a(str(agent.unique_id), Atom(proposition))
+        if(f.semantic(self.ks, world.name)):
+            agent.kb.append(proposition)
 
+    def update_structure(self, agents):
+        print("Updating kripke structure:")
+        """for agent in agents:
+            print(agent)
+            for formula in agent.kb:
+                f = Box_a(str(agent.unique_id), Atom(formula))
+                self.ks = self.ks.solve(f)"""
+
+        print("Worlds left:", self.ks.worlds)
+
+
+
+
+
+    def build_worlds(self, n):
+        worlds = []
+        worlds_dict = {}
         pair = []
         agent_pairs = []
-        agent_perms = permutations(self.agents, 2)
-
-        for p in agent_perms:
+        perms = permutations(self.agents, 2)
+        #worlds = combinations(worlds, n)
+        for p in perms:
             agent_pairs.append(''.join(list(p)))
 
-        #print(agent_pairs)
-        #print()
         worlds = self.combine_agent_pairs(agent_pairs, worlds, pair, n)
+
+        #for w in worlds:
+            #print(w)
 
         for w in worlds:
             name = ''.join([char[-1] for char in w])
-            world_names.append(name)
-            world_objects.append(World(name, {f: True for f in w}))
+            worlds_dict[name] = {f: True for f in w}
 
-        relations = self.build_relations(world_names)
+        print("Total amount of worlds: ", len(worlds))
 
-        print("\nTotal amount of worlds: ", len(worlds))
-
-        return world_objects, relations
+        return worlds_dict, agent_pairs
 
     def combine_agent_pairs(self, agent_pairs, worlds, targets, n):
         """
@@ -151,21 +197,6 @@ class TheShipNAgents:
 
     def update_agent_pairs(self, agent_pairs, a):
         return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
-
-    def build_relations(self, world_names):
-        relations_dict = {}
-
-        relation_perms = product(world_names, repeat=2)
-
-        for p in relation_perms:
-            print("p: ", p)
-
-        #a = {p for p in product(world_names, repeat=2)}
-
-        for a in self.agents:
-            relations_dict[a] = relation_perms
-
-        return relations_dict
 
 def add_symmetric_edges(relations):
     """Routine adds symmetric edges to Kripke frame
