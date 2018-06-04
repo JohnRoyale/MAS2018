@@ -39,7 +39,13 @@ def test_tsn():
     start = timeit.default_timer()
     tsn = TheShipNAgents(3)
     stop = timeit.default_timer()
-    print("Time needed to build worlds: ", stop - start)
+    print("\nTime needed to build worlds: ", stop - start)
+
+
+    ks = tsn.ks
+    f = Box_a('1', Atom('t13'))
+    print("(M,312) |= K_1 t13: ", f.semantic(ks, '312'))
+    print()
 
 #test_ts3()
 test_tsn()
