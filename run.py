@@ -1,6 +1,6 @@
 from model import ShipModel
 # run the model
-model = ShipModel(6)
+model = ShipModel(4)
 for i in range(100):
     print("-------------------------")
     print("Step:", i)

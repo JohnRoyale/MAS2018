@@ -83,9 +83,14 @@ class TheShipNAgents:
     def __init__(self, n):
         self.build_agents(n)
         print("Agents: ", self.agents)
-        worlds = self.build_worlds(n)
+        worlds, propositions = self.build_worlds(n)
+        print("Worlds:", worlds)
+
         kripke_worlds = []
-        print(worlds)
+
+        self.propositions = propositions
+        print("Propositions:", propositions)
+        print()
 
         # create World objects for the Kripke structure
         for world in worlds:
@@ -94,33 +99,56 @@ class TheShipNAgents:
         # initialize the agent world relations
         relations = {}
         for i in range(n):
-            relations[i] = []
+            id = str(i)
+            relations[id] = []
         for world in worlds:
             for i in range(n):
+                id = str(i)
                 # an agent only has an accessibility relation to a world where their target is the same
                 # find the current agent's target
                 formulas = worlds[world]
                 for formula in formulas:
-                    if(int(formula[0])== i+1):
+                    if(formula[0]) == str(i+1):
                         break
                 # look for other worlds where the agent has the same target
                 for other_world in worlds:
                     if(formula in worlds[other_world]):
-                        relations[i].append((world,other_world))
+                        relations[id].append((world,other_world))
 
 
         for r in relations:
             relations[r] = set(relations[r])
         print("Relations:")
-        print(relations)
         self.ks = KripkeStructure(kripke_worlds, relations)
-        #f = Box_a('0', Atom('24'))
-        #print("(M,3142) |= K_1 24: ", f.semantic(self.ks, '3142'))
+        print(self.ks.relations)
+        f = Box_a('2', Atom('23'))
+        #print("(M,231) |= K_1 12: ", f.semantic(self.ks, '312'))
         #print()
 
     def build_agents(self, n):
         for i in range(n):
             self.agents.append(str(i+1))
+
+    # if proposition is true for an agent in all worlds accessible
+    # from the real world, add it to the agent's knowledge base
+    def add_knowledge(self, agent, world, proposition):
+        f = Box_a(str(agent.unique_id), Atom(proposition))
+        if(f.semantic(self.ks, world.name)):
+            agent.kb.append(proposition)
+
+    def update_structure(self, agents):
+        print("Updating kripke structure:")
+        """for agent in agents:
+            print(agent)
+            for formula in agent.kb:
+                f = Box_a(str(agent.unique_id), Atom(formula))
+                self.ks = self.ks.solve(f)"""
+
+        print("Worlds left:", self.ks.worlds)
+
+
+
+
 
     def build_worlds(self, n):
         worlds = []
@@ -132,8 +160,6 @@ class TheShipNAgents:
         for p in perms:
             agent_pairs.append(''.join(list(p)))
 
-        print(agent_pairs)
-        print()
         worlds = self.combine_agent_pairs(agent_pairs, worlds, pair, n)
 
         #for w in worlds:
@@ -145,7 +171,7 @@ class TheShipNAgents:
 
         print("Total amount of worlds: ", len(worlds))
 
-        return worlds_dict
+        return worlds_dict, agent_pairs
 
     def combine_agent_pairs(self, agent_pairs, worlds, targets, n):
         """

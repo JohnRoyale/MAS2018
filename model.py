@@ -32,6 +32,10 @@ class ShipModel(Model):
 
 
 
+
+
+
+
     # kripke model functions
     def construct_kripke(self, N):
         self.kripke_model = TheShipNAgents(N)
@@ -57,8 +61,21 @@ class ShipModel(Model):
         self.corridors[10] = [8]
         self.corridors[11] = [4]
         self.corridors[12] = [6]
-       
-    # initialize rooms and targets
+
+    def update_knowledge(self):
+        # take the real world
+        world = self.kripke_model.ks.worlds[0]
+        for p in self.kripke_model.propositions:
+            # if an agent knows a propositions, add it to its knowledge base
+            for agent in self.schedule.agents:
+                self.kripke_model.add_knowledge(agent, world, p)
+
+        # update the kripke structure, using the new knowledge among agents
+        self.kripke_model.update_structure(self.schedule.agents)
+
+
+
+    # initialize rooms, targets and knowledge
     def init_game(self):
         # randomly distribute the agents over the rooms; don't make agent spawn in the same room
         available_rooms = [i for i in range(len(self.rooms))]
@@ -92,7 +109,6 @@ class ShipModel(Model):
         # take the first world to be the real world
         print("------------------------------------------------------")
         world = self.kripke_model.ks.worlds[0]
-        print("Real world:",world)
         for i in range(self.num_agents):
             for formula in world.assignment:
                 if( int(formula[0]) == i+1 ):
@@ -104,6 +120,14 @@ class ShipModel(Model):
 
         print("------------------------------------------------------")
 
+
+        # add initial knowledge to agent's knowledge base
+        self.update_knowledge()
+
+        print("------------------------------------------------------")
+        print("Initial Agent knowledge:")
+        for agent in self.schedule.agents:
+            print(agent, ":", agent.kb)
 
         
 
