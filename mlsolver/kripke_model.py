@@ -191,18 +191,22 @@ class TheShipNAgents:
 
         for pair in agent_pairs:
             idx = int(pair[1])
-            target_count[idx] += 1
 
-            worlds = self.combine_agent_pairs(self.update_agent_pairs(agent_pairs, pair, target_count[idx]), worlds, targets + [pair],
-                                              target_count, n - 1)
+            worlds = self.combine_agent_pairs(self.update_agent_pairs(agent_pairs, pair, target_count[idx] + 1), worlds, targets + [pair],
+                                              self.increment_target_count(target_count, idx), n - 1)
 
         return worlds
 
     def update_agent_pairs(self, agent_pairs, a, count):
-        if count > len(self.agents) / 2:
+        if count >= len(self.agents) / 2:
             return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
 
         return [c for c in agent_pairs if not (c[0] == a[0] or (c[0] == a[1] and c[1] == a[0]))]
+
+    def increment_target_count(self, target_count, idx):
+        new_target_count = [i for i in target_count]
+        new_target_count[idx] += 1
+        return new_target_count
 
 def add_symmetric_edges(relations):
     """Routine adds symmetric edges to Kripke frame
