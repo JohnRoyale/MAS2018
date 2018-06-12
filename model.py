@@ -63,6 +63,7 @@ class ShipModel(Model):
         self.corridors[12] = [6]
 
     def update_knowledge(self):
+        """
         # take the real world
         world = self.kripke_model.ks.worlds[0]
         for p in self.kripke_model.propositions:
@@ -72,6 +73,10 @@ class ShipModel(Model):
 
         # update the kripke structure, using the new knowledge among agents
         self.kripke_model.update_structure(self.schedule.agents)
+        """
+
+        self.kripke_model.update_structure(self.schedule.agents)
+        self.kripke_model.ks.print()
 
 
 
@@ -111,8 +116,9 @@ class ShipModel(Model):
         world = self.kripke_model.ks.worlds[0]
         for i in range(self.num_agents):
             for formula in world.assignment:
-                if( int(formula[0]) == i+1 ):
-                    self.schedule.agents[i].targets.append(self.schedule.agents[int(formula[1]) - 1])
+                if( int(formula[0]) == i ):
+                    self.schedule.agents[i].targets.append(self.schedule.agents[int(formula[1])])
+                    self.schedule.agents[i].kb[formula] = False
                     break
         print("Targets:")
         for i in range(self.num_agents):

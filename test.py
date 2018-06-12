@@ -37,15 +37,18 @@ def test_ts3():
 
 def test_tsn():
     start = timeit.default_timer()
-    tsn = TheShipNAgents(4)
+    tsn = TheShipNAgents(5)
     stop = timeit.default_timer()
     print("\nTime needed to build worlds: ", stop - start)
 
-
     ks = tsn.ks
-    f = Box_a('1', Atom('t13'))
-    print("(M,312) |= K_1 t13: ", f.semantic(ks, '312'))
+    f = Box_a('0', Atom('13'))
+    #print(ks.nodes_not_follow_formula(f))
+    #print("(M,3421) |= K_1 t13: ", f.semantic(ks, '3421'))
+    ks = ks.solve_a(0, f)
+    f2 = Box_a('1', Atom('24'))
+    ks = ks.solve_a(1, f2)
     print()
+    ks.print()
 
-test_ts3()
-#test_tsn()
+test_tsn()

@@ -8,7 +8,7 @@ class Person(Agent):
         self.position = 0
         self.targets = []
         self.murderers = []
-        self.kb = []
+        self.kb = {}
 
 
     # actions
@@ -76,5 +76,5 @@ class Person(Agent):
 
 
     def __repr__(self):
-        return "Agent " + str(self.unique_id + 1)
+        return "Agent " + str(self.unique_id)
 

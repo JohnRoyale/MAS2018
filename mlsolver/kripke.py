@@ -33,6 +33,24 @@ class KripkeStructure:
             if ks.nodes_not_follow_formula(formula) == []:
                 return ks
 
+    def solve_a(self, agent, formula):
+        nodes_to_remove = self.nodes_not_follow_formula(formula)
+
+        if len(nodes_to_remove) == 0:
+            return self
+
+        relations_to_remove = []
+
+        for relation in self.relations[str(agent)]:
+            for node in nodes_to_remove:
+                if node in relation:
+                    relations_to_remove.append(relation)
+                    break
+
+        self.relations[str(agent)] = self.relations[str(agent)].difference(set(relations_to_remove))
+
+        return self
+
     def remove_node_by_name(self, node_name):
         """Removes ONE node of Kripke frame, therefore we can make knowledge
         base consistent with announcement.
