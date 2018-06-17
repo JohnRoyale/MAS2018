@@ -140,12 +140,21 @@ class TheShipNAgents:
         for agent in agents:
             print(agent, " kb: ", agent.kb)
             for formula in agent.kb:
-                if (agent.kb[formula] == False):
+                # formula only has to be evaluated once ( prop not evaluated yet? -> False)
+                if (agent.kb[formula][1] == False):
                     f = Atom(formula)
+                    # if the formula in the agent's knowledge base is false, negate the formula
+                    if(agent.kb[formula][0] == False):
+                        f = Not(Atom(formula))
                     self.ks = self.ks.solve_a(str(agent.unique_id), f)
-                    agent.kb[formula] = True
+                    # set formula to True, so that it's not going to be evaluated again in the structure update
+                    agent.kb[formula][1] = True
 
-        print("Worlds left:", self.ks.worlds)
+        print("Relations left:", self.ks.relations)
+        N_rels = 0
+        for agent in self.ks.relations.keys():
+            N_rels += len(self.ks.relations[agent])
+        print("Amount of relations left:", N_rels)
 
 
     def build_worlds(self, n):

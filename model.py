@@ -18,6 +18,9 @@ class ShipModel(Model):
         # amount of rooms
         self.N_rooms = 13
 
+        # keep track of the real world
+        self.real_world = None
+
         for i in range(self.num_agents):
             a = Person(i, self)
             self.schedule.add(a)
@@ -29,6 +32,8 @@ class ShipModel(Model):
         self.construct_kripke(N)
         self.construct_graph()
         self.init_game()
+
+        print("Initial amount of worlds:", len(self.kripke_model.ks.worlds))
 
 
 
@@ -76,7 +81,7 @@ class ShipModel(Model):
         """
 
         self.kripke_model.update_structure(self.schedule.agents)
-        self.kripke_model.ks.print()
+        #self.kripke_model.ks.print()
 
     # the real world has to have unique killer-target pairs
     def correct_real_world(self, world):
@@ -128,16 +133,18 @@ class ShipModel(Model):
         print("------------------------------------------------------")
         # take a random world where each agent targets a different agent
         worlds = self.kripke_model.ks.worlds
-        world = random.choice(worlds)
+        self.real_world = random.choice(worlds)
 
-        while(not(self.correct_real_world(world))):
-            world = random.choice(worlds)
+        while(not(self.correct_real_world(  self.real_world))):
+            self.real_world = random.choice(worlds)
+
+        print("***** Real world: ******", self.real_world)
 
         for i in range(self.num_agents):
-            for formula in world.assignment:
+            for formula in self.real_world.assignment:
                 if( int(formula[0]) == i ):
                     self.schedule.agents[i].targets.append(self.schedule.agents[int(formula[1])])
-                    self.schedule.agents[i].kb[formula] = False
+                    self.schedule.agents[i].kb[formula] = [True, False]
                     break
         print("Targets:")
         for i in range(self.num_agents):
@@ -179,8 +186,8 @@ class ShipModel(Model):
 
 
     def step(self):
-        # print("ROOMS:", self.rooms)
-        # print()
+        #print("Worlds left:", len(self.kripke_model.ks.worlds))
+
         print("Living:", self.living_agents)
         print("Dead:", self.dead_agents)
         print("Smart:", self.smart_agents)

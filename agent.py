@@ -9,15 +9,25 @@ class Person(Agent):
         self.targets = []
         self.murderers = []
         self.kb = {}
+        # remember an agent's last move
+        self.last_move = ""
+        #remember an agent's last roommates
+        self.roommates = []
 
 
     # actions
     def evaluateKB(self):
         pass
 
-
+    # update an agent's knowledge base based on recent events; then update the kripke model
     def updateKB(self):
-        pass
+        # for each roommate, if the agent did not flee from them, the agent knows that they are not one of its killers
+        if(self.last_move != "flee"):
+            for agent in self.roommates:
+                id = agent.unique_id
+                formula = str(id) + str(self.unique_id)
+                self.kb[formula] = [False, False]
+            self.model.update_knowledge()
 
     # move the agent to a random other room
     def move(self):
@@ -59,20 +69,27 @@ class Person(Agent):
 
             # get the room that the agent is in
             room = self.model.rooms[self.position]
+            # remember the roommates
+            self.roommates = room[:]
+            # remove self from roommates
+            #print(room, self.position)
+            self.roommates.remove(self)
+
             # if the agent is in the same room with any of its murderers, the agent flees
             if(any(murderer in room for murderer in self.murderers)):
                 self.flee()
+                self.last_move = "flee"
             #if the agent is in the same room with any of its targets, the agent will select
             # one of them randomly to kill
             elif(any(target in room for target in self.targets)):
                 selected = random.randint(0, len(self.targets) - 1)
                 self.kill(self.targets[selected], room)
+                self.last_move = "kill"
             else:
                 self.stay()
+                self.last_move = "stay"
 
-            self.evaluateKB()
             self.updateKB()
-
 
 
     def __repr__(self):
