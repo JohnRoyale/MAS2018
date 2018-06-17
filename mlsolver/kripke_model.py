@@ -104,6 +104,13 @@ class TheShipNAgents:
         for world in worlds:
             for i in range(n):
                 id = str(i)
+
+                # if the agent has no murderer in a world, the agent cannot possibly access this world (because the
+                # agent is dead in this case)
+                if (id not in world):
+                    continue
+
+
                 # an agent only has an accessibility relation to a world where their target is the same
                 # find the current agent's target
                 formulas = worlds[world]
@@ -150,7 +157,9 @@ class TheShipNAgents:
                     # set formula to True, so that it's not going to be evaluated again in the structure update
                     agent.kb[formula][1] = True
 
-        print("Relations left:", self.ks.relations)
+        print("Relations left:")
+        for agent in self.ks.relations.keys():
+            print("Agent", agent, ":", self.ks.relations[agent])
         N_rels = 0
         for agent in self.ks.relations.keys():
             N_rels += len(self.ks.relations[agent])

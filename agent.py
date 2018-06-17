@@ -29,6 +29,8 @@ class Person(Agent):
                 self.kb[formula] = [False, False]
             self.model.update_knowledge()
 
+        # check if, according to transition relations, if an agent knows its murderer(s)
+
     # move the agent to a random other room
     def move(self):
         corridors = self.model.corridors[self.position]
