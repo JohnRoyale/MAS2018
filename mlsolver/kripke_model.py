@@ -119,7 +119,7 @@ class TheShipNAgents:
                         break
                 # look for other worlds where the agent has the same target
                 for other_world in worlds:
-                    if(formula in worlds[other_world]):
+                    if(formula in worlds[other_world] and id in other_world):
                         relations[id].append((world,other_world))
 
 
