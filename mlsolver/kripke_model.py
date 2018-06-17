@@ -101,6 +101,7 @@ class TheShipNAgents:
         for i in range(n):
             id = str(i)
             relations[id] = []
+
         for world in worlds:
             for i in range(n):
                 id = str(i)

@@ -29,7 +29,31 @@ class Person(Agent):
                 self.kb[formula] = [False, False]
             self.model.update_knowledge()
 
-        # check if, according to transition relations, if an agent knows its murderer(s)
+        # check if, according to transition relations, an agent knows its murderer(s)
+        # look at the transition relations for this agent
+        relations = list(self.model.kripke_model.ks.relations[str(self.unique_id)])
+
+        world1 = relations[0][0]
+        potential_murderer = world1.index(str(self.unique_id))
+        murderer_found = True
+        # check all worlds to see if potential murderer is in all of them
+        for worlds in relations:
+            w = worlds[0]
+            #print(w)
+            murderer = w.index(str(self.unique_id))
+            if(murderer != potential_murderer):
+                murderer_found = False
+                break
+
+        # if murderer was the same in all worlds considered possible by the agent, it has to be his murderer
+        if(murderer_found):
+            self.murderers.append(self.model.schedule.agents[potential_murderer])
+            formula = str(potential_murderer) + str(self.unique_id)
+            self.kb[formula] = [True, False]
+
+
+
+
 
     # move the agent to a random other room
     def move(self):
