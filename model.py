@@ -78,6 +78,20 @@ class ShipModel(Model):
         self.kripke_model.update_structure(self.schedule.agents)
         self.kripke_model.ks.print()
 
+    # the real world has to have unique killer-target pairs
+    def correct_real_world(self, world):
+        counts = []
+        for i in range(len(self.schedule.agents)):
+            counts.append(0)
+        for formula in world.assignment:
+            counts[int(formula[1])] += 1
+            # if agent appears as a target for more than 1 agent, the world is not suitable as the real world
+            if(counts[int(formula[1])] > 1):
+                return False
+        return True
+
+
+
 
 
     # initialize rooms, targets and knowledge
@@ -111,9 +125,14 @@ class ShipModel(Model):
         """
 
         # assign targets based on agent knowledge
-        # take the first world to be the real world
         print("------------------------------------------------------")
-        world = self.kripke_model.ks.worlds[0]
+        # take a random world where each agent targets a different agent
+        worlds = self.kripke_model.ks.worlds
+        world = random.choice(worlds)
+
+        while(not(self.correct_real_world(world))):
+            world = random.choice(worlds)
+
         for i in range(self.num_agents):
             for formula in world.assignment:
                 if( int(formula[0]) == i ):
