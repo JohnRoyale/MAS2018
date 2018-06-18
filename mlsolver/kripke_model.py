@@ -167,7 +167,7 @@ class TheShipNAgents:
                     # set formula to True, so that it's not going to be evaluated again in the structure update
                     agent.kb[formula][1] = True
 
-        #self.print_relations()
+        self.print_relations()
 
     def print_relations(self):
         print("Relations left:")
