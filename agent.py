@@ -80,15 +80,11 @@ class Person(Agent):
 
         self.targets.remove(target)
 
-        # add observers to new targets; add agent as murderer to observers;
-        #don't add self as murderer
+        # update knowledge of any observers present
         for agent in room:
             if (agent != self and agent != target):
-                # add new knowledge to kb of murderer and new target
-                self.kb[(str(self.unique_id) + str(agent.unique_id))] = [True, False]
-                self.targets.append(agent)
-                agent.kb[(str(self.unique_id) + str(agent.unique_id))] = [True, False]
-                agent.murderers.append(self)
+                # add new knowledge to kb of witness
+                agent.kb[(str(self.unique_id) + str(target.unique_id))] = [True, False]
 
     # don't take any action
     def stay(self):
@@ -109,7 +105,7 @@ class Person(Agent):
             self.roommates.remove(self)
 
             # if the agent is in the same room with any of its murderers, the agent flees
-            if(any(murderer in room for murderer in self.murderers)):
+            if(any(murderer and murderer.alive in room for murderer in self.murderers)):
                 self.flee()
                 self.last_move = "flee"
             #if the agent is in the same room with any of its targets, the agent will select

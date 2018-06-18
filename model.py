@@ -16,7 +16,7 @@ class ShipModel(Model):
         # the corridors determine the connections between the rooms
         self.corridors = {}
         # amount of rooms
-        self.N_rooms = 10
+        self.N_rooms = 8
 
         # keep track of the real world
         self.real_world = None
@@ -53,16 +53,14 @@ class ShipModel(Model):
             self.rooms.append([])
         
         # establish the room connections
-        self.corridors[0] = [2]
-        self.corridors[1] = [2, 4]
-        self.corridors[2] = [0, 1, 3, 5]
-        self.corridors[3] = [2, 6]
-        self.corridors[4] = [1, 5, 7]
-        self.corridors[5] = [2, 4, 6, 8]
-        self.corridors[6] = [3, 5, 9]
-        self.corridors[7] = [4, 8]
-        self.corridors[8] = [5, 7, 9]
-        self.corridors[9] = [6, 8]
+        self.corridors[0] = [1, 2]
+        self.corridors[1] = [0, 2, 3, 5]
+        self.corridors[2] = [0, 1, 4, 6]
+        self.corridors[3] = [1, 4, 5, 7]
+        self.corridors[4] = [2, 3, 6, 7]
+        self.corridors[5] = [1, 3]
+        self.corridors[6] = [2, 4]
+        self.corridors[7] = [3, 4]
 
     def update_knowledge(self):
         """

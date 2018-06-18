@@ -220,10 +220,7 @@ class TheShipNAgents:
         return worlds
 
     def update_agent_pairs(self, agent_pairs, a, count):
-        if count >= len(self.agents) / 2:
-            return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
-
-        return [c for c in agent_pairs if not (c[0] == a[0] or (c[0] == a[1] and c[1] == a[0]))]
+        return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
 
     def increment_target_count(self, target_count, idx):
         new_target_count = [i for i in target_count]
