@@ -87,7 +87,7 @@ The bottom left shows each living agent's action and movement during each turn. 
 worlds and relations at the start of the simulation, the number of worlds and relations during each subsequent step, and
 the number of dead, living and smart agents (agent that know who their killer is).
 
-![Figure 1: The Ship GUI](https://github.com/JohnRoyale/MAS2018/blob/master/GUI.jpg)
+![Figure 1: The Ship GUI](https://imgur.com/a/d9Ms00U)
 
 Epistemic logic model
 ---------------------
