@@ -24,10 +24,10 @@ class Person(Agent):
         # for each roommate, if the agent did not flee from them, the agent knows that they are not one of its killers
         if(self.last_move != "flee"):
             for agent in self.roommates:
-                id = agent.unique_id
-                formula = str(id) + str(self.unique_id)
-                self.kb[formula] = [False, False]
-            self.model.update_knowledge()
+                if(agent.alive):
+                    id = agent.unique_id
+                    formula = str(id) + str(self.unique_id)
+                    self.kb[formula] = [False, False]
 
         # check if, according to transition relations, an agent knows its murderer(s)
         # look at the transition relations for this agent
@@ -39,7 +39,6 @@ class Person(Agent):
         # check all worlds to see if potential murderer is in all of them
         for worlds in relations:
             w = worlds[0]
-            #print(w)
             murderer = w.index(str(self.unique_id))
             if(murderer != potential_murderer):
                 murderer_found = False
@@ -51,7 +50,7 @@ class Person(Agent):
             formula = str(potential_murderer) + str(self.unique_id)
             self.kb[formula] = [True, False]
 
-
+        self.model.update_knowledge()
 
 
 
@@ -81,7 +80,10 @@ class Person(Agent):
         #don't add self as murderer
         for agent in room:
             if (agent != self and agent != target):
+                # add new knowledge to kb of murderer and new target
+                self.kb[(str(self.unique_id) + str(agent.unique_id))] = [True, False]
                 self.targets.append(agent)
+                agent.kb[(str(self.unique_id) + str(agent.unique_id))] = [True, False]
                 agent.murderers.append(self)
 
     # don't take any action
