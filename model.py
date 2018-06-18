@@ -39,10 +39,10 @@ class ShipModel(Model):
         self.construct_kripke(N)
         self.construct_graph()
 
+        self.init_game()
+
         self.n_init_worlds = self.count_worlds()
         self.n_init_rels = self.count_rels()
-
-        self.init_game()
 
         # set visual parameters
         pygame.init()
@@ -195,7 +195,7 @@ class ShipModel(Model):
         self.kripke_model.update_structure(self.schedule.agents)
         """
         self.kripke_model.update_structure(self.schedule.agents)
-        self.kripke_model.ks.print()
+        #self.kripke_model.ks.print()
 
     # the real world has to have unique killer-target pairs
     def correct_real_world(self, world):
@@ -357,9 +357,18 @@ class ShipModel(Model):
         pygame.draw.rect(screen, [200,200,200], self.info_rect, 5)
         screen.blit(self.small_text.render("N initial worlds: " + str(self.n_init_worlds) + "    -    " + "N initial relations: " + str(self.n_init_rels), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 5))
         screen.blit(self.small_text.render("N current worlds: " + str(self.count_worlds()) + "    -    " + "N current relations: " + str(self.count_rels()), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 30))
-        screen.blit(self.small_text.render("Living agents: " + str(self.living_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 80))
-        screen.blit(self.small_text.render("Dead agents: " + str(self.dead_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 105))
-        screen.blit(self.small_text.render("Smart agents: " + str(self.smart_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 130))
+        screen.blit(self.small_text.render("Targets: ", True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 55))
+
+        output = "      "
+        for i in range(self.num_agents - 1):
+            output += "[" + str(self.schedule.agents[i])[-1] + ", " + str(self.schedule.agents[i].targets)[-2] + "] - "
+        output += "[" + str(self.schedule.agents[-1])[-1] + ", " + str(self.schedule.agents[-1].targets)[-2] + "]"
+
+        screen.blit(self.small_text.render(output, True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 80))
+
+        screen.blit(self.small_text.render("Living agents: " + str(self.living_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 105))
+        screen.blit(self.small_text.render("Dead agents: " + str(self.dead_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 130))
+        screen.blit(self.small_text.render("Smart agents: " + str(self.smart_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 155))
 
 
 

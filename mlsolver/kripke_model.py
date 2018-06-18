@@ -84,13 +84,13 @@ class TheShipNAgents:
         self.build_agents(n)
         print("Agents: ", self.agents)
         worlds, propositions = self.build_worlds(n)
-        print("Worlds:", worlds)
+        #print("Worlds:", worlds)
 
         kripke_worlds = []
 
         self.propositions = propositions
-        print("Propositions:", propositions)
-        print()
+        #print("Propositions:", propositions)
+        #print()
 
         # create World objects for the Kripke structure
         for world in worlds:
@@ -126,9 +126,9 @@ class TheShipNAgents:
 
         for r in relations:
             relations[r] = set(relations[r])
-        print("Relations:")
+        #print("Relations:")
         self.ks = KripkeStructure(kripke_worlds, relations)
-        print(self.ks.relations)
+        #print(self.ks.relations)
 
     def build_agents(self, n):
         for i in range(n):
@@ -167,7 +167,7 @@ class TheShipNAgents:
                     # set formula to True, so that it's not going to be evaluated again in the structure update
                     agent.kb[formula][1] = True
 
-        self.print_relations()
+        #self.print_relations()
 
     def print_relations(self):
         print("Relations left:")
