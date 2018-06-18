@@ -373,6 +373,13 @@ class ShipModel(Model):
 
 
     ################## main loop function ######################
+    def game_over(self):
+        for agent in self.schedule.agents:
+            if (agent.alive and len(agent.targets) > 0):
+                return False
+
+        print("Game over")
+        return True
 
     def step(self):
         #print("Worlds left:", len(self.kripke_model.ks.worlds))
@@ -453,6 +460,9 @@ class ShipModel(Model):
             if duration < 1000/self.MAX_FPS:
                 x = 1000/self.MAX_FPS - duration
                 pygame.time.delay(int(x))
+
+            if self.game_over():
+                quit = True
 
         pygame.quit()
 
