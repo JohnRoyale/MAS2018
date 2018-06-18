@@ -176,7 +176,7 @@ Results
 =======
 Table 1:
 
-   agents   begin relations   worlds   collapsed agents   relations left   \% complexity reduction
+   N agents | N starting relations | N worlds | N collapsed agents | N relations left   | % complexity reduction
   -------- ----------------- -------- ------------------ ---------------- -------------------------
      4            16            6             2                8.2                   51
      5            180           24            0                58.4                  32
