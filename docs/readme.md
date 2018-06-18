@@ -175,11 +175,13 @@ after the game stops. We also count the average amount of agents
 Results
 =======
 Table 1:
-   agents |  begin relations |  worlds | collapsed agents | relations left | %complexity reduction
-  -------- | ----------------- | -------- | ------------------ | ---------------- | -------------------------
-  4 | 16 | 6 | 2 | 8.2 | 51
-  5     |       180         |  24      |      0             |   58.4           |       32
-  6     |      6144         | 160      |      0             |   1887           |       31
+
+   agents   begin relations   worlds   collapsed agents   relations left   \% complexity reduction
+  -------- ----------------- -------- ------------------ ---------------- -------------------------
+     4            16            6             2                8.2                   51
+     5            180           24            0                58.4                  32
+     6           6144          160            0                1887                  31
+
 
 The results of the model runs are summarized in Table 1. It shows the collapsed agents and relations left in the Kripke model, averaged
 over 5 runs for three different settings. The percentage of complexity reduction is also shown, which is the proportion of relations that have been removed from the Kripke model.
