@@ -1,6 +1,6 @@
 from model import ShipModel
 # run the model
-model = ShipModel(4)
+model = ShipModel(6)
 
 n_worlds = len(model.kripke_model.ks.worlds)
 
