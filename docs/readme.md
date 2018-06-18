@@ -77,9 +77,10 @@ There are some constraints on the model, which are as follows:
     nothing* action.
 
 In the backend of our program, we use the Python multi-agent library
-*Mesa* for agent-based modeling (<https://github.com/projectmesa/mesa>).
+*Mesa* for agent-based modeling (https://github.com/projectmesa/mesa>).
 For building and updating the Kripke model, we use the *mlsolver*
-library (<https://github.com/erohkohl/mlsolver>).
+library (https://github.com/erohkohl/mlsolver). The GUI is written
+using the PyGame library (https://www.pygame.org/news).
 
 Epistemic logic model
 ---------------------
@@ -173,22 +174,20 @@ after the game stops. We also count the average amount of agents
 
 Results
 =======
-
-\centering
-   agents   begin relations   worlds   collapsed agents   relations left   \% complexity reduction
-  -------- ----------------- -------- ------------------ ---------------- -------------------------
-     4            16            6             2                8.2                   51
-     5            180           24            0                58.4                  32
-     6           6144          160            0                1887                  31
+   agents |  begin relations |  worlds | collapsed agents | relations left | %complexity reduction
+  -------- | ----------------- | -------- | ------------------ | ---------------- | -------------------------
+     4     |       16          |  6       |      2             |   8.2            |       51
+     5     |       180         |  24      |      0             |   58.4           |       32
+     6     |      6144         | 160      |      0             |   1887           |       31
 
   : Collapsed agents and relations left in the Kripke model, averaged
   over 5 runs for three different settings. The percentage of complexity
   reduction is also shown, which is the proportion of relations that
-  have been removed from the Kripke model.[]{label="tab:results"}
+  have been removed from the Kripke model.
 
-The results of the model runs are summarized in Table
-[\[tab:results\]](#tab:results){reference-type="ref"
-reference="tab:results"}.
+The results of the model runs are summarized in Table 1. An image of the GUI can be found in the figure below.
+
+![Figure 1: The Ship GUI](https://github.com/JohnRoyale/MAS2018/GUI.jpg)
 
 Discussion
 ==========
@@ -196,80 +195,10 @@ Discussion
 As we can see in the results, it seems that the amount that we are able
 to reduce the complexity of the kripke model (which can get very large
 very quickly) gets reduced as the number of agents increases. This makes
-sense, as having more
-
-\iffalse
-Proposal
-========
-
-*The Ship* is a multiplayer videogame where all players are on a cruise
-ship together. At the start of the game, each player receives the name
-of their target, which is one of the other players. Each player has to
-kill their target while avoiding getting killed themselves. Initially,
-each player does not know whose target they are, which is something they
-have to find out in order to increase their odds of survival.\
-\
-For our project, we want to implement a multi-agent simulation based on
-the premise of *The Ship*. Like the game, our simulation has a set of
-agents where each agent has to kill one of the other agents, while not
-getting killed themselves. At the start of the simulation, each agent
-only knows their own target. The simulation environment will consist of
-a graph, where each node represents a room in the ship. Each agent can
-only see agents that are in the same room. The simulation will be
-turn-based, where each turn consists of two phases:
-
-1.  **The movement phase:** Each agent will move to a different room,
-    adjacent to its current room.
-
-2.  **The action phase:** Each agent will do one of the following
-    actions: *do nothing*, *flee* or *kill agent*.
-
-To keep our model simple, we will have the following constraints which
-are known by each agent:
-
--   Each agent has exactly one unique target, which is another agent.
-    This means that each agent only is targeted by exactly one other
-    agent as well.
-
--   Two agents can never target each other. Note that, due to this
-    constraint, a given model must at least have three agents.
-
--   An agent that is in a room with their target, will always perform
-    the *kill agent* action on their target.
-
--   If an agent knows by whom they are targeted, and if they are
-    currently in the same room as this agent, they will always perform
-    the *flee* action.
-
--   If none of the above rules apply, an agent will perform the *do
-    nothing* action.
-
-We want to model this version of the game using epistemic logic. Given a
-set of $n$ agents $A = \{1, 2, ..., n\}$, formulae will be of the form
-$t_{ij}$ with $i \neq j$ and $i, j \in A$, which stands for *i targets
-j*. A Kripke model would consist of a world for every combination of
-killer-target pairs. For example, for three agents and given the
-constraints above, we would have two worlds: $w_1$, where we have the
-formulae $\{k_{12}, k_{23}, k_{31}\}$ and $w_2$, where we have
-$\{k_{13}, k_{21}, k_{32}\}$. In general, for $n$ agents, we would
-initially have $(n-1)(n-2)$ different worlds.\
-There is an additional game rule that will make the game a bit more
-interesting, from an epistemic point of view. When an agent observes
-someone murdering another agent, both the observer and the murderer know
-this. To tie any loose ends, the murderer now also has to murder this
-observer, as the murderer knows that the observer knows that the
-murderer has murdered someone. In this situation, the observer knows
-that the murderer knows that the observer saw the murder, which means
-that the observer has another murderer to worry about (if his previous
-murderer(s) is/are still alive).
-
-During the simulation, the Kripke model will decrease in complexity as
-agents reason about their prospective killers by observing the actions
-of the agents around them. Eventually, every agent will know by whom
-they are targeted[^1]. At this point, all uncertainty is gone and the
-Kripke model will have collapsed to one state. This is where the
-simulation ends.
-
-[^1]: We will somewhat break suspension of disbelief by saying that if
-    agent $i$ is killed by agent $j$, agent $i$ will know that they are
-    $j$'s target, despite the fact that they are dead
+sense, as having more agents makes it harder to figure out who your own
+murderer is, since you first have to figure out that everyone except
+your murderer is not your murderer. With 4 agents, it's easier to figure
+this out, which is also reflected in the fact that 2 agents were able to
+figure out the real world, on average. Unfortunately, no agents were
+able to figure this out in the 5 runs for both the 5 agents and 6 agents
+setting.
