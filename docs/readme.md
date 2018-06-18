@@ -6,7 +6,7 @@ It is a type of murder mystery game (like cluedo), where multiple
 players are on a cruise ship together. At the start of the game every
 player is given a murder target which is another player on the cruise
 ship. The targets are assigned in such a way that every player is both a
-target and a murderer.\
+target and a murderer.
 When the game starts the players only know the last known location of
 their target and do not know who has them as a target. The identity of
 the target can be obtained by talking to them. In the videogame other
@@ -17,7 +17,7 @@ allowed to murder their targets while being observed by guards, cameras
 or NPCs. The final goal for a player is to kill their target (and their
 murderer) while avoiding getting killed themselves. Players have to be
 smart and able to deduce who their target and murderer are to avoid
-being murdered while successfully accomplishing their mission.\
+being murdered while successfully accomplishing their mission.
 For our project, we want to implement a multi-agent simulation based on
 the premise of *The Ship*. Since the game is quite elaborate we propose
 a simplified turn-based simulation, but the basic idea stays the same.
@@ -27,7 +27,7 @@ There are no NPCs and it is allowed to murder targets in front of
 witnesses, and these events will expand the knowledge of the agents
 involved. The agents will need to use logical reasoning to find out who
 their murderer is. Besides this, the agents will also try to figure out
-who targets who, such that they can figure out what the real world is.\
+who targets who, such that they can figure out what the real world is.
 
 Setup
 =====
@@ -77,7 +77,7 @@ There are some constraints on the model, which are as follows:
     nothing* action.
 
 In the backend of our program, we use the Python multi-agent library
-*Mesa* for agent-based modeling (https://github.com/projectmesa/mesa>).
+*Mesa* for agent-based modeling (https://github.com/projectmesa/mesa).
 For building and updating the Kripke model, we use the *mlsolver*
 library (https://github.com/erohkohl/mlsolver). The GUI is written
 using the PyGame library (https://www.pygame.org/news).
@@ -86,15 +86,15 @@ Epistemic logic model
 ---------------------
 
 We want to model this version of the game using epistemic logic. Given a
-set of $n$ agents $A = \{1, 2, ..., n\}$, formulae will be of the form
-$t_{ij}$ with $i \neq j$ and $i, j \in A$, which stands for *i targets
+set of n agents A = {1, 2, ..., n}, formulae will be of the form
+t_{ij} with i \neq j and i, j \in A, which stands for *i targets
 j*. A Kripke model would consist of a world for every combination of
 killer-target pairs. For example, for three agents and given the
-constraints above, we would have two worlds: $w_1$, where we have the
-formulae $\{t_{12}, t_{23}, t_{31}\}$ and $w_2$, where we have
-$\{t_{13}, t_{21}, t_{32}\}$. In general, for $n$ agents, we would
-initially have $(n-1)(n-2)$ different worlds. For simplicity, we omit
-the $t$ part of the propositions in the actual implementation.\
+constraints above, we would have two worlds: w_1, where we have the
+formulae \{t_{12}, t_{23}, t_{31}\} and w_2, where we have
+\{t_{13}, t_{21}, t_{32}\}. In general, for n agents, we would
+initially have (n-1)(n-2) different worlds. For simplicity, we omit
+the t part of the propositions in the actual implementation.\
 During the simulation, the Kripke model will decrease in complexity as
 agents reason about their and others' prospective killers by observing
 the actions of the agents around them. There are a variety of ways in
@@ -107,7 +107,7 @@ flee from their murderer, given that they know who their murderer is.
 This allows for knowledge acquisition, followed by inference. Each agent
 in the game contains a knowledge base, which contains propositions of
 the form described above. At the start of the game, for each agent i,
-knowledge base i only contains the proposition $ij$, where j is their
+knowledge base i only contains the proposition ij, where j is their
 target. Therefore, the agents initially only know who they have to
 murder and nothing else. After the action phase ends and before the
 movement phase begins, each knowledge base is sent to the modal logic
