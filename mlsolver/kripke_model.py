@@ -150,7 +150,16 @@ class TheShipNAgents:
             for formula in agent.kb:
                 # formula only has to be evaluated once ( prop not evaluated yet? -> False)
                 if (agent.kb[formula][1] == False):
-                    f = Atom(formula)
+                    if("v" in formula):
+                        formula_list = formula.split("v")
+                        f1 = Atom(formula_list[0])
+                        f2 = Atom(formula_list[1])
+                        final_formula = Or(f1,f2)
+                        for i in range(len(formula_list) - 2):
+                            f = Atom(formula_list[i + 2])
+                            final_formula = Or(final_formula, f)
+                    else:
+                        f = Atom(formula)
                     # if the formula in the agent's knowledge base is false, negate the formula
                     if(agent.kb[formula][0] == False):
                         f = Not(Atom(formula))

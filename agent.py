@@ -29,6 +29,28 @@ class Person(Agent):
                     formula = str(id) + str(self.unique_id)
                     self.kb[formula] = [False, False]
 
+        if (self.last_move == "flee"):
+            for agent in self.roommates:
+                if(len(self.roommates) == 3):
+                    if(agent != self and agent not in self.murderers):
+                        formula = str(self.murderers[0].unique_id) + str(self.unique_id)
+                        agent.kb[formula] = [True, False]
+                if (len(self.roommates) > 3):
+                    if (agent != self and agent not in self.murderers):
+                        possible_murderers = self.roommates[:]
+                        possible_murderers.remove(self)
+                        possible_murderers.remove(agent)
+                        formula = ""
+                        for m in possible_murderers:
+                            formula = formula + str(m.unique_id) + str(self.unique_id) + "v"
+                            formula = formula[:-1]
+                        agent.kb[formula] = [True, False]
+
+
+
+
+
+
         # check if, according to transition relations, an agent knows its murderer(s)
         # look at the transition relations for this agent
         relations = list(self.model.kripke_model.ks.relations[str(self.unique_id)])
