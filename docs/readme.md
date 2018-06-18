@@ -87,7 +87,7 @@ Epistemic logic model
 
 We want to model this version of the game using epistemic logic. Given a
 set of n agents A = {1, 2, ..., n}, formulae will be of the form
-t_{ij} with i \neq j and i, j \in A, which stands for *i targets
+t<sub>ij</sub> with i \neq j and i, j \in A, which stands for *i targets
 j*. A Kripke model would consist of a world for every combination of
 killer-target pairs. For example, for three agents and given the
 constraints above, we would have two worlds: w_1, where we have the
