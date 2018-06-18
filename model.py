@@ -1,14 +1,18 @@
 from mesa import Model
-from mesa.time import RandomActivation, BaseScheduler
+from mesa.time import RandomActivation
 from agent import Person
 from mlsolver.kripke_model import TheShipNAgents
 import random
+import pygame
+import time
+import sys
+from pygame.locals import *
 
 
 class ShipModel(Model):
     """The ship with a number of logical agents"""
     def __init__(self, N):
-        self.schedule = BaseScheduler(self)
+        self.schedule = RandomActivation(self)
         self.num_agents = N
         self.kripke_model = []
         # the rooms store which agents are currently in which rooms
@@ -16,10 +20,13 @@ class ShipModel(Model):
         # the corridors determine the connections between the rooms
         self.corridors = {}
         # amount of rooms
-        self.N_rooms = 10
+        self.N_rooms = 8
 
         # keep track of the real world
         self.real_world = None
+
+        # initialize print queue
+        self.print_queue = []
 
         for i in range(self.num_agents):
             a = Person(i, self)
@@ -31,17 +38,64 @@ class ShipModel(Model):
 
         self.construct_kripke(N)
         self.construct_graph()
+
         self.init_game()
 
-        print("Initial amount of worlds:", len(self.kripke_model.ks.worlds))
+        self.n_init_worlds = self.count_worlds()
+        self.n_init_rels = self.count_rels()
+
+        # set visual parameters
+        pygame.init()
+        self.MAX_FPS = 50
+        pygame.mouse.set_visible
+        self.mouse = {'l_down': -1, 'l_up': -1, 'pos': (0,0)}
+
+        self.background = pygame.image.load("ship2.jpg")
+        self.bg_width = self.background.get_width()
+        self.bg_height = self.background.get_height()
+        self.small_text = pygame.font.SysFont(None, 20)
+        self.medium_text = pygame.font.SysFont(None, 30)
+        self.text = pygame.font.SysFont(None, 40)
+        self.game_height = 100
+        self.zero_location = (self.bg_width/2 + 50, 300)
+        self.roomlocations = [(self.zero_location[0], self.zero_location[1]),
+                              (self.zero_location[0] - 100, self.zero_location[1] + 100),
+                              (self.zero_location[0] + 100, self.zero_location[1] + 100),
+                              (self.zero_location[0] - 100, self.zero_location[1] + 200),
+                              (self.zero_location[0] + 100, self.zero_location[1] + 200),
+                              (self.zero_location[0] - 250, self.zero_location[1] + 150),
+                              (self.zero_location[0] + 250, self.zero_location[1] + 150),
+                              (self.zero_location[0], self.zero_location[1] + 250)]
 
 
+        info = pygame.display.Info()
+        #window_dimensions = (self.screen_width, self.screen_height)
+        window_dimensions = (self.bg_width, 1000)
+        self.screen_width = int(window_dimensions[0])
+        self.screen_height = int(window_dimensions[1])
+        #self.screen_width = int(self.UI_PORTION * self.screen_width)
+        self.GAMEDISPLAY = pygame.display.set_mode(window_dimensions)
+        pygame.display.set_caption('The Ship')
+
+        self.draw_init(self.GAMEDISPLAY)
+        self.draw_step(self.GAMEDISPLAY)
 
 
+        self.play = False
+        self.running = True
 
+    def count_worlds(self):
+        return len(self.kripke_model.ks.worlds)
 
+    def count_rels(self):
+        n_init_relations = 0
+        for r in self.kripke_model.ks.relations.keys():
+            n_init_relations += len(self.kripke_model.ks.relations[r])
 
-    # kripke model functions
+        return n_init_relations
+
+    ################### init functions ######################
+
     def construct_kripke(self, N):
         self.kripke_model = TheShipNAgents(N)
 
@@ -53,48 +107,14 @@ class ShipModel(Model):
             self.rooms.append([])
         
         # establish the room connections
-        self.corridors[0] = [2]
-        self.corridors[1] = [2, 4]
-        self.corridors[2] = [0, 1, 3, 5]
-        self.corridors[3] = [2, 6]
-        self.corridors[4] = [1, 5, 7]
-        self.corridors[5] = [2, 4, 6, 8]
-        self.corridors[6] = [3, 5, 9]
-        self.corridors[7] = [4, 8]
-        self.corridors[8] = [5, 7, 9]
-        self.corridors[9] = [6, 8]
-
-    def update_knowledge(self):
-        """
-        # take the real world
-        world = self.kripke_model.ks.worlds[0]
-        for p in self.kripke_model.propositions:
-            # if an agent knows a propositions, add it to its knowledge base
-            for agent in self.schedule.agents:
-                self.kripke_model.add_knowledge(agent, world, p)
-
-        # update the kripke structure, using the new knowledge among agents
-        self.kripke_model.update_structure(self.schedule.agents)
-        """
-
-        self.kripke_model.update_structure(self.schedule.agents)
-        #self.kripke_model.ks.print()
-
-    # the real world has to have unique killer-target pairs
-    def correct_real_world(self, world):
-        counts = []
-        for i in range(len(self.schedule.agents)):
-            counts.append(0)
-        for formula in world.assignment:
-            counts[int(formula[1])] += 1
-            # if agent appears as a target for more than 1 agent, the world is not suitable as the real world
-            if(counts[int(formula[1])] > 1):
-                return False
-        return True
-
-
-
-
+        self.corridors[0] = [1, 2]
+        self.corridors[1] = [0, 2, 3, 5]
+        self.corridors[2] = [0, 1, 4, 6]
+        self.corridors[3] = [1, 4, 7]
+        self.corridors[4] = [2, 3, 6, 7]
+        self.corridors[5] = [1, 3]
+        self.corridors[6] = [2, 4]
+        self.corridors[7] = [3, 4]
 
     # initialize rooms, targets and knowledge
     def init_game(self):
@@ -127,6 +147,7 @@ class ShipModel(Model):
         """
 
         # assign targets based on agent knowledge
+        # take the first world to be the real world
         print("------------------------------------------------------")
         # take a random world where each agent targets a different agent
         worlds = self.kripke_model.ks.worlds
@@ -158,7 +179,35 @@ class ShipModel(Model):
         for agent in self.schedule.agents:
             print(agent, ":", agent.kb)
 
-        
+
+    ################# update functions ################
+
+    def update_knowledge(self):
+        """
+        # take the real world
+        world = self.kripke_model.ks.worlds[0]
+        for p in self.kripke_model.propositions:
+            # if an agent knows a propositions, add it to its knowledge base
+            for agent in self.schedule.agents:
+                self.kripke_model.add_knowledge(agent, world, p)
+
+        # update the kripke structure, using the new knowledge among agents
+        self.kripke_model.update_structure(self.schedule.agents)
+        """
+        self.kripke_model.update_structure(self.schedule.agents)
+        #self.kripke_model.ks.print()
+
+    # the real world has to have unique killer-target pairs
+    def correct_real_world(self, world):
+        counts = []
+        for i in range(len(self.schedule.agents)):
+            counts.append(0)
+        for formula in world.assignment:
+            counts[int(formula[1])] += 1
+            # if agent appears as a target for more than 1 agent, the world is not suitable as the real world
+            if (counts[int(formula[1])] > 1):
+                return False
+        return True
 
     # all agents take a move step
     def move_agents(self):
@@ -179,11 +228,162 @@ class ShipModel(Model):
             self.rooms[position].append(self.schedule.agents[i])
 
 
+    ################ event handlers ###############
+
+    def reset_mouse(self):
+        self.mouse['l_down'] = -1
+        self.mouse['l_up'] = -1
+
+    def button_active(self, button, check_click=True):
+        if check_click and not self.mouse['l_down'] == 1:
+            # No mouse click
+            return False
+
+        if self.mouse['pos'][0] >= button.x + button.w or \
+           self.mouse['pos'][0] < button.x:
+            return False
+        if self.mouse['pos'][1] >= button.y + button.h or \
+           self.mouse['pos'][1] < button.y:
+            return False
+        return True
+
+    def check_buttons(self):
+        if self.button_active(self.start_rect):
+            self.pause = False
+        if self.button_active(self.pause_rect):
+            self.pause = True
+        if self.button_active(self.step_rect):
+            self.step()
 
 
+    def parse_events(self, event_handle):
+        # Handle input events
+        for event in event_handle:
+            if event.type == QUIT:
+                quit = True
+                pygame.quit()
+                sys.exit()
+            else:
+                try:
+                    self.mouse['pos'] = event.dict['pos']
+                except:
+                    self.mouse['pos'] = (0,0)
+                if event.type == MOUSEBUTTONDOWN:
+                    if event.dict['button'] == 1:
+                        self.mouse['l_down'] = 1
+                elif event.type == MOUSEBUTTONUP:
+                    if event.dict['button'] == 1:
+                        self.mouse['l_up'] = 1
+
+
+    ################ visualization functions ###################
+
+    def draw_init(self, screen):
+        self.control_rect = Rect(0, 0, self.screen_width, 100)
+        self.game_rect = Rect(0, 100, self.screen_width, 500)
+        self.actions_rect = Rect(0, 100+self.bg_height, self.screen_width/2, 400)
+        self.info_rect = Rect(1+self.screen_width/2, 100+self.bg_height, self.screen_width/2, 400)
+
+        # control boxes
+        self.button_amount = 3
+        self.start_rect = Rect(0, 0, self.screen_width/self.button_amount, 100)
+        self.pause_rect = Rect(1*self.screen_width/self.button_amount, 0, self.screen_width/self.button_amount, 100)
+        self.step_rect = Rect(2*self.screen_width/self.button_amount, 0, self.screen_width/self.button_amount, 100)
+        # self.pause_rect = Rect(3*self.screen_width/self.button_amount, 0, self.screen_width/self.button_amount, 100)
+
+
+        # self.GAMEDISPLAY.fill([255, 255, 255], self.game_rect)
+        # self.GAMEDISPLAY.fill([0, 0, 0], self.control_rect)
+        # self.GAMEDISPLAY.fill([255, 255, 255], self.actions_rect)
+        # self.GAMEDISPLAY.blit(self.background, (0, 100))
+
+    def draw_step(self, screen):
+        self.draw_level(screen)
+        self.draw_controls(screen)
+        self.draw_agents(screen)
+        self.draw_actions(screen)
+        self.draw_knowledge(screen)
+
+    def draw_controls(self, screen):
+        screen.fill([220, 220, 220], self.control_rect)
+        # screen.fill([220, 220, 220], self.start_rect)
+        # screen.fill([220, 220, 220], self.pause_rect)
+        # screen.fill([220, 220, 220], self.step_rect)
+        pygame.draw.rect(screen, [200,200,200], self.start_rect, 5)
+        pygame.draw.rect(screen, [200,200,200], self.pause_rect, 5)
+        pygame.draw.rect(screen, [200,200,200], self.step_rect, 5)
+
+        screen.blit(self.text.render("Play", True, [0, 0, 0]), (self.start_rect.x+(self.start_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Pause", True, [0, 0, 0]), (self.pause_rect.x+(self.pause_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Next", True, [0, 0, 0]), (self.step_rect.x+(self.step_rect.w/2)-20, 40))
+
+    def draw_level(self, screen):
+        screen.fill([220, 220, 220])
+        screen.blit(self.background, (0, 100))
+
+    def draw_agents(self, screen):
+        for idx, corridor in enumerate(self.corridors):
+            #print(self.corridors[idx])
+            #print(idx)
+            roomlocation = self.roomlocations[idx]
+            temp_roomloc = (roomlocation[0]+50, roomlocation[1]+15)
+            for connection in self.corridors[idx]:
+                connector = self.roomlocations[connection]
+                temp_connectorloc = (connector[0]+50, connector[1]+15)
+                pygame.draw.line(screen, [0, 0, 0], temp_roomloc, temp_connectorloc, 3)
+
+        #draw rooms and agents in rooms
+        for idx, room in enumerate(self.rooms):
+            location = self.roomlocations[idx]
+            room_agents = []
+            for agent in room:
+                room_agents.append(agent.unique_id)
+
+            rect = Rect(location[0], location[1], 100, 30)
+            pygame.draw.rect(screen, [200, 200, 200], rect)
+            screen.blit(self.small_text.render(str(idx) + "  " + str(room_agents), True, [0, 0, 0]), (rect.x+5, rect.y+5))
+
+
+
+
+    def draw_actions(self, screen):
+        pygame.draw.rect(screen, [200,200,200], self.actions_rect, 5)
+        y = self.actions_rect.y+5
+        for action in self.print_queue:
+            screen.blit(self.medium_text.render(str(action), True, [0, 0, 0]), (self.actions_rect.x+5, y))
+            y += 25
+
+    def draw_knowledge(self, screen):
+        pygame.draw.rect(screen, [200,200,200], self.info_rect, 5)
+        screen.blit(self.small_text.render("N initial worlds: " + str(self.n_init_worlds) + "    -    " + "N initial relations: " + str(self.n_init_rels), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 5))
+        screen.blit(self.small_text.render("N current worlds: " + str(self.count_worlds()) + "    -    " + "N current relations: " + str(self.count_rels()), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 30))
+        screen.blit(self.small_text.render("Targets: ", True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 55))
+
+        output = "      "
+        for i in range(self.num_agents - 1):
+            output += "[" + str(self.schedule.agents[i])[-1] + ", " + str(self.schedule.agents[i].targets)[-2] + "] - "
+        output += "[" + str(self.schedule.agents[-1])[-1] + ", " + str(self.schedule.agents[-1].targets)[-2] + "]"
+
+        screen.blit(self.small_text.render(output, True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 80))
+
+        screen.blit(self.small_text.render("Living agents: " + str(self.living_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 105))
+        screen.blit(self.small_text.render("Dead agents: " + str(self.dead_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 130))
+        screen.blit(self.small_text.render("Smart agents: " + str(self.smart_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 155))
+
+
+
+    ################## main loop function ######################
+    def game_over(self):
+        for agent in self.schedule.agents:
+            if (agent.alive and len(agent.targets) > 0):
+                return False
+
+        print("Game over")
+        return True
 
     def step(self):
         #print("Worlds left:", len(self.kripke_model.ks.worlds))
+        self.print_queue = []
 
         print("Living:", self.living_agents)
         print("Dead:", self.dead_agents)
@@ -226,4 +426,57 @@ class ShipModel(Model):
             if(agent.alive and len(agent.murderers) != 0 and agent not in self.smart_agents):
                 self.smart_agents.append(agent)
 
+        # redraw game
+        # self.draw_step(self.GAMEDISPLAY)
+        # pygame.display.update()
 
+        if len(self.smart_agents) > 0:
+            self.running = False
+
+    def run(self):
+        quit = False
+        self.pause = True
+        TICK = USEREVENT + 1
+        pygame.time.set_timer(TICK, 1000)
+        # Simulation loop
+        while not quit:
+            frame_time = pygame.time.get_ticks()
+
+            # Clear inputs each frame
+            self.reset_mouse()
+            self.key = None
+
+            if(pygame.event.peek(TICK) and not self.pause):
+                self.step()
+            self.parse_events(pygame.event.get())
+
+            self.check_buttons()
+
+            self.draw_step(self.GAMEDISPLAY)
+
+            pygame.display.update()
+
+            duration = pygame.time.get_ticks() - frame_time
+            if duration < 1000/self.MAX_FPS:
+                x = 1000/self.MAX_FPS - duration
+                pygame.time.delay(int(x))
+
+            if self.game_over():
+                quit = True
+
+        pygame.quit()
+
+
+############### run program #############
+
+if __name__ == '__main__':
+    try:
+        n = int(sys.argv[1])
+    except:
+        print("Give the amount of agents as an integer")
+    if (n > 3 and n < 7):
+        game = ShipModel(n)
+        game.run()
+        sys.exit()
+    else:
+        print("Input between 4-6 agents")

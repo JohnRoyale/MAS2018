@@ -84,13 +84,13 @@ class TheShipNAgents:
         self.build_agents(n)
         print("Agents: ", self.agents)
         worlds, propositions = self.build_worlds(n)
-        print("Worlds:", worlds)
+        #print("Worlds:", worlds)
 
         kripke_worlds = []
 
         self.propositions = propositions
-        print("Propositions:", propositions)
-        print()
+        #print("Propositions:", propositions)
+        #print()
 
         # create World objects for the Kripke structure
         for world in worlds:
@@ -126,9 +126,9 @@ class TheShipNAgents:
 
         for r in relations:
             relations[r] = set(relations[r])
-        print("Relations:")
+        #print("Relations:")
         self.ks = KripkeStructure(kripke_worlds, relations)
-        print(self.ks.relations)
+        #print(self.ks.relations)
 
     def build_agents(self, n):
         for i in range(n):
@@ -147,16 +147,26 @@ class TheShipNAgents:
         print("Updating kripke structure:")
         for agent in agents:
             print(agent, " kb: ", agent.kb)
-            for formula in agent.kb:
-                # formula only has to be evaluated once ( prop not evaluated yet? -> False)
-                if (agent.kb[formula][1] == False):
-                    f = Atom(formula)
-                    # if the formula in the agent's knowledge base is false, negate the formula
-                    if(agent.kb[formula][0] == False):
-                        f = Not(Atom(formula))
-                    self.ks = self.ks.solve_a(str(agent.unique_id), f)
-                    # set formula to True, so that it's not going to be evaluated again in the structure update
-                    agent.kb[formula][1] = True
+            if (agent.alive):
+                for formula in agent.kb:
+                    # formula only has to be evaluated once ( prop not evaluated yet? -> False)
+                    if (agent.kb[formula][1] == False):
+                        if("v" in formula):
+                            formula_list = formula.split("v")
+                            f1 = Atom(formula_list[0])
+                            f2 = Atom(formula_list[1])
+                            final_formula = Or(f1,f2)
+                            for i in range(len(formula_list) - 2):
+                                f = Atom(formula_list[i + 2])
+                                final_formula = Or(final_formula, f)
+                        else:
+                            f = Atom(formula)
+                        # if the formula in the agent's knowledge base is false, negate the formula
+                        if(agent.kb[formula][0] == False):
+                            f = Not(Atom(formula))
+                        self.ks = self.ks.solve_a(str(agent.unique_id), f)
+                        # set formula to True, so that it's not going to be evaluated again in the structure update
+                        agent.kb[formula][1] = True
 
         #self.print_relations()
 
@@ -220,10 +230,7 @@ class TheShipNAgents:
         return worlds
 
     def update_agent_pairs(self, agent_pairs, a, count):
-        if count >= len(self.agents) / 2:
-            return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
-
-        return [c for c in agent_pairs if not (c[0] == a[0] or (c[0] == a[1] and c[1] == a[0]))]
+        return [c for c in agent_pairs if not (c[0] == a[0] or c[1] == a[1] or (c[0] == a[1] and c[1] == a[0]))]
 
     def increment_target_count(self, target_count, idx):
         new_target_count = [i for i in target_count]
