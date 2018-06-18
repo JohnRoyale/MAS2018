@@ -385,10 +385,10 @@ if __name__ == '__main__':
         n = int(sys.argv[1])
     except:
         print("Give the amount of agents as an integer")
-    if (n > 3 and n < 6):
+    if (n > 3 and n < 7):
         game = ShipModel(n)
         game.run()
         sys.exit()
     else:
-        print("Input 4 or 5 agents")
+        print("Input between 4-6 agents")
     
