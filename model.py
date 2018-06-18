@@ -25,6 +25,9 @@ class ShipModel(Model):
         # keep track of the real world
         self.real_world = None
 
+        # initialize print queue
+        self.print_queue = []
+
         for i in range(self.num_agents):
             a = Person(i, self)
             self.schedule.add(a)
@@ -47,6 +50,7 @@ class ShipModel(Model):
         self.bg_width = self.background.get_width()
         self.bg_height = self.background.get_height()
         self.small_text = pygame.font.SysFont(None, 20)
+        self.medium_text = pygame.font.SysFont(None, 30)
         self.text = pygame.font.SysFont(None, 40)
         self.game_height = 100
         self.zero_location = (self.bg_width/2 + 50, 300)
@@ -180,6 +184,18 @@ class ShipModel(Model):
         self.kripke_model.update_structure(self.schedule.agents)
         self.kripke_model.ks.print()
 
+    # the real world has to have unique killer-target pairs
+    def correct_real_world(self, world):
+        counts = []
+        for i in range(len(self.schedule.agents)):
+            counts.append(0)
+        for formula in world.assignment:
+            counts[int(formula[1])] += 1
+            # if agent appears as a target for more than 1 agent, the world is not suitable as the real world
+            if (counts[int(formula[1])] > 1):
+                return False
+        return True
+
     # all agents take a move step
     def move_agents(self):
         for agent in self.schedule.agents:
@@ -294,8 +310,8 @@ class ShipModel(Model):
 
     def draw_agents(self, screen):
         for idx, corridor in enumerate(self.corridors):
-            print(self.corridors[idx])
-            print(idx)
+            #print(self.corridors[idx])
+            #print(idx)
             roomlocation = self.roomlocations[idx]
             temp_roomloc = (roomlocation[0]+50, roomlocation[1]+15)
             for connection in self.corridors[idx]:
@@ -312,13 +328,17 @@ class ShipModel(Model):
 
             rect = Rect(location[0], location[1], 100, 30)
             pygame.draw.rect(screen, [200, 200, 200], rect)
-            screen.blit(self.small_text.render(str(room_agents), True, [0, 0, 0]), (rect.x+5, rect.y+5))
+            screen.blit(self.small_text.render(str(idx) + "  " + str(room_agents), True, [0, 0, 0]), (rect.x+5, rect.y+5))
 
 
 
 
     def draw_actions(self, screen):
         pygame.draw.rect(screen, [200,200,200], self.actions_rect, 5)
+        y = self.actions_rect.y+5
+        for action in self.print_queue:
+            screen.blit(self.medium_text.render(str(action), True, [0, 0, 0]), (self.actions_rect.x+5, y))
+            y += 25
 
     def draw_knowledge(self, screen):
         pygame.draw.rect(screen, [200,200,200], self.info_rect, 5)
@@ -329,6 +349,7 @@ class ShipModel(Model):
 
     def step(self):
         #print("Worlds left:", len(self.kripke_model.ks.worlds))
+        self.print_queue = []
 
         print("Living:", self.living_agents)
         print("Dead:", self.dead_agents)
@@ -380,7 +401,7 @@ class ShipModel(Model):
 
     def run(self):
         quit = False
-        self.pause = False
+        self.pause = True
         TICK = USEREVENT + 1
         pygame.time.set_timer(TICK, 1000)
         # Simulation loop

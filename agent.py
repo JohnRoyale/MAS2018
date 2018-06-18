@@ -83,9 +83,13 @@ class Person(Agent):
         self.position = corridors[selected]
 
         if(flee):
-            print(self, "fled to room", self.position)
+            output = str(self) + " fled to room " + str(self.position)
+            print(output)
+            self.model.print_queue.append(output)
         else:
-            print(self, "moved to room", self.position)
+            output = str(self) + " moved to room " + str(self.position)
+            print(output)
+            self.model.print_queue.append(output)
 
         # update the rooms
         self.model.update_rooms()
@@ -96,7 +100,9 @@ class Person(Agent):
         self.move(flee=True)
     
     def kill(self, target, room):
-        print(self, "stabs", target, "to death in room", str(self.position) + "!")
+        output = str(self) + " kills " + str(target) + " in room " + str(self.position) + "!"
+        print(output)
+        self.model.print_queue.append(output)
         # victim agent is now no longer alive; remove him from murderer's target list
         target.alive = False
 
@@ -110,7 +116,9 @@ class Person(Agent):
 
     # don't take any action
     def stay(self):
-        print(self, "stayed in room", self.position)
+        output = str(self) + " stayed in room " + str(self.position)
+        print(output)
+        self.model.print_queue.append(output)
 
     def step(self):
         if(self.alive):
