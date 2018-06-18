@@ -147,25 +147,26 @@ class TheShipNAgents:
         print("Updating kripke structure:")
         for agent in agents:
             print(agent, " kb: ", agent.kb)
-            for formula in agent.kb:
-                # formula only has to be evaluated once ( prop not evaluated yet? -> False)
-                if (agent.kb[formula][1] == False):
-                    if("v" in formula):
-                        formula_list = formula.split("v")
-                        f1 = Atom(formula_list[0])
-                        f2 = Atom(formula_list[1])
-                        final_formula = Or(f1,f2)
-                        for i in range(len(formula_list) - 2):
-                            f = Atom(formula_list[i + 2])
-                            final_formula = Or(final_formula, f)
-                    else:
-                        f = Atom(formula)
-                    # if the formula in the agent's knowledge base is false, negate the formula
-                    if(agent.kb[formula][0] == False):
-                        f = Not(Atom(formula))
-                    self.ks = self.ks.solve_a(str(agent.unique_id), f)
-                    # set formula to True, so that it's not going to be evaluated again in the structure update
-                    agent.kb[formula][1] = True
+            if (agent.alive):
+                for formula in agent.kb:
+                    # formula only has to be evaluated once ( prop not evaluated yet? -> False)
+                    if (agent.kb[formula][1] == False):
+                        if("v" in formula):
+                            formula_list = formula.split("v")
+                            f1 = Atom(formula_list[0])
+                            f2 = Atom(formula_list[1])
+                            final_formula = Or(f1,f2)
+                            for i in range(len(formula_list) - 2):
+                                f = Atom(formula_list[i + 2])
+                                final_formula = Or(final_formula, f)
+                        else:
+                            f = Atom(formula)
+                        # if the formula in the agent's knowledge base is false, negate the formula
+                        if(agent.kb[formula][0] == False):
+                            f = Not(Atom(formula))
+                        self.ks = self.ks.solve_a(str(agent.unique_id), f)
+                        # set formula to True, so that it's not going to be evaluated again in the structure update
+                        agent.kb[formula][1] = True
 
         #self.print_relations()
 

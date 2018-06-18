@@ -1,4 +1,5 @@
 from mesa import Agent
+from mlsolver.formula import Atom
 import random
 
 class Person(Agent):
@@ -112,6 +113,12 @@ class Person(Agent):
         target.alive = False
 
         self.targets.remove(target)
+
+        # update knowledge of target
+        f = (str(self.unique_id) + str(target.unique_id))
+        target.kb[f] = [True, True]
+        f = Atom(f)
+        self.model.kripke_model.ks = self.model.kripke_model.ks.solve_a(str(target.unique_id), f)
 
         # update knowledge of any observers present
         for agent in room:
