@@ -82,6 +82,13 @@ For building and updating the Kripke model, we use the *mlsolver*
 library (https://github.com/erohkohl/mlsolver). The GUI is written
 using the PyGame library (https://www.pygame.org/news).
 
+An image of the GUI can be found in the figure below. All 8 rooms are shown, together with the agents in each room.
+The bottom left shows each living agent's action and movement during each turn. The bottom right shows the number of
+worlds and relations at the start of the simulation, the number of worlds and relations during each subsequent step, and
+the number of dead, living and smart agents (agent that know who their killer is).
+
+![Figure 1: The Ship GUI](https://github.com/JohnRoyale/MAS2018/blob/master/GUI.jpg)
+
 Epistemic logic model
 ---------------------
 
@@ -185,9 +192,7 @@ Table 1:
 The results of the model runs are summarized in Table 1. It shows the collapsed agents and relations left in the Kripke model, averaged
 over 5 runs for three different settings. The percentage of complexity reduction is also shown, which is the proportion of relations that have been removed from the Kripke model.
 
-An image of the GUI can be found in the figure below.
 
-![Figure 1: The Ship GUI](https://github.com/JohnRoyale/MAS2018/blob/master/GUI.jpg)
 
 Discussion
 ==========
