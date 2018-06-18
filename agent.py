@@ -110,12 +110,13 @@ class Person(Agent):
             elif(any(target in room for target in self.targets)):
                 selected = random.randint(0, len(self.targets) - 1)
                 self.kill(self.targets[selected], room)
+
                 self.last_move = "kill"
             else:
                 self.stay()
                 self.last_move = "stay"
 
-            self.updateKB()
+
 
 
     def __repr__(self):

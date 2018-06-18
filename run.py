@@ -1,10 +1,10 @@
 from model import ShipModel
 # run the model
-model = ShipModel(4)
+model = ShipModel(5)
 
 n_worlds = len(model.kripke_model.ks.worlds)
 
-for i in range(1000):
+for i in range(100):
     print("-------------------------")
     print("Step:", i)
     model.step()

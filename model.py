@@ -1,5 +1,5 @@
 from mesa import Model
-from mesa.time import RandomActivation
+from mesa.time import RandomActivation, BaseScheduler
 from agent import Person
 from mlsolver.kripke_model import TheShipNAgents
 import random
@@ -8,7 +8,7 @@ import random
 class ShipModel(Model):
     """The ship with a number of logical agents"""
     def __init__(self, N):
-        self.schedule = RandomActivation(self)
+        self.schedule = BaseScheduler(self)
         self.num_agents = N
         self.kripke_model = []
         # the rooms store which agents are currently in which rooms
@@ -165,9 +165,9 @@ class ShipModel(Model):
 
     # all agents take a move step
     def move_agents(self):
-
         for agent in self.schedule.agents:
             if (agent.alive):
+                agent.updateKB()
                 agent.move()
 
 
@@ -194,6 +194,24 @@ class ShipModel(Model):
         # agents perform action step
         print("------")
         print("ACTING:")
+
+        # re-add agents to schedule
+        # check if agent is in room with target
+        """agents_copy = list(self.schedule.agents)[:]
+        self.schedule = BaseScheduler(self)
+
+        for i in range(self.num_agents):
+            agent = agents_copy[i]
+            room = self.rooms[agent.position]
+            if(any(target in room for target in agent.targets)):
+                self.schedule.add(agent)
+                agents_copy.remove(agent)
+
+        # add any remaining agents to the schedule
+        for agent in agents_copy:
+            self.schedule.add(agent)"""
+
+
         self.schedule.step()
         # agents perform move step
         print("------")
@@ -208,4 +226,5 @@ class ShipModel(Model):
 
             if(agent.alive and len(agent.murderers) != 0 and agent not in self.smart_agents):
                 self.smart_agents.append(agent)
+
 
