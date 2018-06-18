@@ -92,9 +92,9 @@ j*. A Kripke model would consist of a world for every combination of
 killer-target pairs. For example, for three agents and given the
 constraints above, we would have two worlds: w<sub>1</sub>, where we have the
 formulae t<sub>12</sub>, t<sub>23</sub>, t<sub>31</sub> and w<sub>2</sub>, where we have
-{t<sub>13</sub>, t<sub>21</sub>, t<sub>32</sub>. In general, for n agents, we would
+t<sub>13</sub>, t<sub>21</sub>, t<sub>32</sub>. In general, for n agents, we would
 initially have (n-1)(n-2) different worlds. For simplicity, we omit
-the t part of the propositions in the actual implementation.\
+the t part of the propositions in the actual implementation.
 During the simulation, the Kripke model will decrease in complexity as
 agents reason about their and others' prospective killers by observing
 the actions of the agents around them. There are a variety of ways in
