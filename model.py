@@ -241,8 +241,8 @@ class ShipModel(Model):
     def draw_init(self, screen):
         self.control_rect = Rect(0, 0, self.screen_width, 100)
         self.game_rect = Rect(0, 100, self.screen_width, 500)
-        self.actions_rect = Rect(0, 600, self.screen_width/2, 400)
-        self.info_rect = Rect(1+self.screen_width/2, 100, self.screen_width, 400)
+        self.actions_rect = Rect(0, 100+self.bg_height, self.screen_width/2, 400)
+        self.info_rect = Rect(1+self.screen_width/2, 100+self.bg_height, self.screen_width/2, 400)
 
         # control boxes
         self.button_amount = 3
@@ -258,8 +258,8 @@ class ShipModel(Model):
         # self.GAMEDISPLAY.blit(self.background, (0, 100))
     
     def draw_step(self, screen):
-        self.draw_controls(screen)
         self.draw_level(screen)
+        self.draw_controls(screen)
         self.draw_agents(screen)
         self.draw_actions(screen)
         self.draw_knowledge(screen)
@@ -273,12 +273,12 @@ class ShipModel(Model):
         pygame.draw.rect(screen, [200,200,200], self.pause_rect, 5)
         pygame.draw.rect(screen, [200,200,200], self.step_rect, 5)
 
-        screen.blit(self.text.render("Play", True, [255, 255, 255]), (self.start_rect.x+(self.start_rect.w/2)-20, 40))
-        screen.blit(self.text.render("Pause", True, [255, 255, 255]), (self.pause_rect.x+(self.pause_rect.w/2)-20, 40))
-        screen.blit(self.text.render("Next", True, [255, 255, 255]), (self.step_rect.x+(self.step_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Play", True, [0, 0, 0]), (self.start_rect.x+(self.start_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Pause", True, [0, 0, 0]), (self.pause_rect.x+(self.pause_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Next", True, [0, 0, 0]), (self.step_rect.x+(self.step_rect.w/2)-20, 40))
 
     def draw_level(self, screen):
-        screen.fill([255, 255, 255], self.game_rect)
+        screen.fill([220, 220, 220])
         screen.blit(self.background, (0, 100))
 
     def draw_agents(self, screen):
@@ -307,10 +307,10 @@ class ShipModel(Model):
 
             
     def draw_actions(self, screen):
-        screen.fill([255, 255, 255], self.actions_rect)
+        pygame.draw.rect(screen, [200,200,200], self.actions_rect, 5)
 
     def draw_knowledge(self, screen):
-        pass
+        pygame.draw.rect(screen, [200,200,200], self.info_rect, 5)
 
 
 
@@ -374,8 +374,6 @@ class ShipModel(Model):
             if duration < 1000/self.MAX_FPS:
                 x = 1000/self.MAX_FPS - duration
                 pygame.time.delay(int(x))
-                
-            self.last_frame_time = pygame.time.get_ticks() - frame_time
                 
         pygame.quit()
 
