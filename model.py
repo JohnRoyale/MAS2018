@@ -282,6 +282,16 @@ class ShipModel(Model):
         screen.blit(self.background, (0, 100))
 
     def draw_agents(self, screen):
+        for idx, corridor in enumerate(self.corridors):
+            print(self.corridors[idx])
+            print(idx)
+            roomlocation = self.roomlocations[idx]
+            temp_roomloc = (roomlocation[0]+50, roomlocation[1]+15)
+            for connection in self.corridors[idx]:
+                connector = self.roomlocations[connection]
+                temp_connectorloc = (connector[0]+50, connector[1]+15)
+                pygame.draw.line(screen, [0, 0, 0], temp_roomloc, temp_connectorloc, 3)
+
         #draw rooms and agents in rooms
         for idx, room in enumerate(self.rooms):
             location = self.roomlocations[idx]
@@ -293,12 +303,7 @@ class ShipModel(Model):
             pygame.draw.rect(screen, [200, 200, 200], rect)
             screen.blit(self.small_text.render(str(room_agents), True, [0, 0, 0]), (rect.x+5, rect.y+5))
 
-        for idx, corridor in enumerate(self.corridors):
-            roomlocation = self.roomlocations[idx]
-            # for connection in corridor:
-            #     connector = self.roomlocations[connection]
-            #     # draw arrow from roomloc to connectorloc
-            #     pass        
+        
 
             
     def draw_actions(self, screen):
