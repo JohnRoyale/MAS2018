@@ -55,11 +55,15 @@ class Person(Agent):
 
 
     # move the agent to a random other room
-    def move(self):
+    def move(self, flee=False):
         corridors = self.model.corridors[self.position]
         selected = random.randint(0, len(corridors) - 1)
         self.position = corridors[selected]
-        print(self, "moved to room", self.position)
+
+        if(flee):
+            print(self, "fled to room", self.position)
+        else:
+            print(self, "moved to room", self.position)
 
         # update the rooms
         self.model.update_rooms()
@@ -67,7 +71,7 @@ class Person(Agent):
 
     # optional action (kill, flee, stay)
     def flee(self):
-        self.move()
+        self.move(flee=True)
     
     def kill(self, target, room):
         print(self, "stabs", target, "to death in room", str(self.position) + "!")
@@ -117,7 +121,6 @@ class Person(Agent):
             else:
                 self.stay()
                 self.last_move = "stay"
-
 
 
 

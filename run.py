@@ -8,11 +8,6 @@ for i in range(1000):
     print("-------------------------")
     print("Step:", i)
     model.step()
+    input()
 
 print(n_worlds)
-
-
-
-
-
-

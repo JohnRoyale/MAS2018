@@ -191,6 +191,8 @@ class ShipModel(Model):
         print("Living:", self.living_agents)
         print("Dead:", self.dead_agents)
         print("Smart:", self.smart_agents)
+        print("Filled rooms:")
+        print(self.rooms)
         # agents perform action step
         print("------")
         print("ACTING:")
