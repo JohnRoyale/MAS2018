@@ -21,30 +21,35 @@ class Person(Agent):
 
     # update an agent's knowledge base based on recent events; then update the kripke model
     def updateKB(self):
-        # for each roommate, if the agent did not flee from them, the agent knows that they are not one of its killers
+        # for each roommate, if the agent did not flee from them, the roomate knows that the other agents
+        #  are not his killer
         if(self.last_move != "flee"):
             for agent in self.roommates:
-                if(agent.alive):
+                if(agent.alive and agent != self):
                     id = agent.unique_id
                     formula = str(id) + str(self.unique_id)
-                    self.kb[formula] = [False, False]
+                    #self.kb[formula] = [False, False]
+                    for otheragent in self.roommates:
+                        otheragent.kb[formula] = [False, False]
+
 
         if (self.last_move == "flee"):
             for agent in self.roommates:
-                if(len(self.roommates) == 3):
-                    if(agent != self and agent not in self.murderers):
-                        formula = str(self.murderers[0].unique_id) + str(self.unique_id)
-                        agent.kb[formula] = [True, False]
-                if (len(self.roommates) > 3):
-                    if (agent != self and agent not in self.murderers):
-                        possible_murderers = self.roommates[:]
-                        possible_murderers.remove(self)
-                        possible_murderers.remove(agent)
-                        formula = ""
-                        for m in possible_murderers:
-                            formula = formula + str(m.unique_id) + str(self.unique_id) + "v"
-                            formula = formula[:-1]
-                        agent.kb[formula] = [True, False]
+                if(agent.alive):
+                    if(len(self.roommates) == 3):
+                        if(agent != self and agent not in self.murderers):
+                            formula = str(self.murderers[0].unique_id) + str(self.unique_id)
+                            agent.kb[formula] = [True, False]
+                    if (len(self.roommates) > 3):
+                        if (agent != self and agent not in self.murderers):
+                            possible_murderers = self.roommates[:]
+                            possible_murderers.remove(self)
+                            possible_murderers.remove(agent)
+                            formula = ""
+                            for m in possible_murderers:
+                                formula = formula + str(m.unique_id) + str(self.unique_id) + "v"
+                                formula = formula[:-1]
+                            agent.kb[formula] = [True, False]
 
 
 

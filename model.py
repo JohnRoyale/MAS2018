@@ -8,7 +8,7 @@ import random
 class ShipModel(Model):
     """The ship with a number of logical agents"""
     def __init__(self, N):
-        self.schedule = BaseScheduler(self)
+        self.schedule = RandomActivation(self)
         self.num_agents = N
         self.kripke_model = []
         # the rooms store which agents are currently in which rooms
