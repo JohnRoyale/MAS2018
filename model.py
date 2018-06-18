@@ -16,7 +16,7 @@ class ShipModel(Model):
         # the corridors determine the connections between the rooms
         self.corridors = {}
         # amount of rooms
-        self.N_rooms = 13
+        self.N_rooms = 10
 
         # keep track of the real world
         self.real_world = None
