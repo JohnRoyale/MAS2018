@@ -1,16 +1,3 @@
----
-author:
-- |
-    Jasper Krebbers\
-    Paul Ozkohen\
-    Jelle Visser
-date: May 2018
-title: |
-    Multi-Agent Systems Project Report:\
-    The Ship
----
-
-\maketitle
 Introduction
 ============
 
