@@ -38,6 +38,10 @@ class ShipModel(Model):
 
         self.construct_kripke(N)
         self.construct_graph()
+
+        self.n_init_worlds = self.count_worlds()
+        self.n_init_rels = self.count_rels()
+
         self.init_game()
 
         # set visual parameters
@@ -80,6 +84,15 @@ class ShipModel(Model):
         self.play = False
         self.running = True
 
+    def count_worlds(self):
+        return len(self.kripke_model.ks.worlds)
+
+    def count_rels(self):
+        n_init_relations = 0
+        for r in self.kripke_model.ks.relations.keys():
+            n_init_relations += len(self.kripke_model.ks.relations[r])
+
+        return n_init_relations
 
     ################### init functions ######################
 
@@ -342,6 +355,11 @@ class ShipModel(Model):
 
     def draw_knowledge(self, screen):
         pygame.draw.rect(screen, [200,200,200], self.info_rect, 5)
+        screen.blit(self.small_text.render("N initial worlds: " + str(self.n_init_worlds) + "    -    " + "N initial relations: " + str(self.n_init_rels), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 5))
+        screen.blit(self.small_text.render("N current worlds: " + str(self.count_worlds()) + "    -    " + "N current relations: " + str(self.count_rels()), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 30))
+        screen.blit(self.small_text.render("Living agents: " + str(self.living_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 80))
+        screen.blit(self.small_text.render("Dead agents: " + str(self.dead_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 105))
+        screen.blit(self.small_text.render("Smart agents: " + str(self.smart_agents), True, [0, 0, 0]), (self.info_rect.x + 5, self.info_rect.y + 130))
 
 
 
