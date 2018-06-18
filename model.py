@@ -20,7 +20,7 @@ class ShipModel(Model):
         # the corridors determine the connections between the rooms
         self.corridors = {}
         # amount of rooms
-        self.N_rooms = 13
+        self.N_rooms = 8
 
         for i in range(self.num_agents):
             a = Person(i, self)
@@ -40,17 +40,26 @@ class ShipModel(Model):
         pygame.mouse.set_visible
         self.mouse = {'l_down': -1, 'l_up': -1, 'pos': (0,0)}
 
-        self.background = pygame.image.load("titanic.png")
+        self.background = pygame.image.load("ship2.jpg")
+        self.bg_width = self.background.get_width()
+        self.bg_height = self.background.get_height()
+        self.small_text = pygame.font.SysFont(None, 20)
+        self.text = pygame.font.SysFont(None, 40)
         self.game_height = 100
-        self.roomlocations = [(200,self.game_height+250), (250,self.game_height+250), (300,self.game_height+250), (350,self.game_height+250), 
-                              (400,self.game_height+250), (450,self.game_height+250), (500,self.game_height+250), (550,self.game_height+250), 
-                              (600,self.game_height+250), (650,self.game_height+250), (700,self.game_height+250), (750,self.game_height+250), 
-                              (800,self.game_height+250)]
+        self.zero_location = (self.bg_width/2 + 50, 300)
+        self.roomlocations = [(self.zero_location[0], self.zero_location[1]),
+                              (self.zero_location[0] - 100, self.zero_location[1] + 100),
+                              (self.zero_location[0] + 100, self.zero_location[1] + 100),
+                              (self.zero_location[0] - 100, self.zero_location[1] + 200),
+                              (self.zero_location[0] + 100, self.zero_location[1] + 200),
+                              (self.zero_location[0] - 250, self.zero_location[1] + 150),
+                              (self.zero_location[0] + 250, self.zero_location[1] + 150),
+                              (self.zero_location[0], self.zero_location[1] + 250)]
 
 
         info = pygame.display.Info()
         #window_dimensions = (self.screen_width, self.screen_height)
-        window_dimensions = (1600,1000)
+        window_dimensions = (self.bg_width, 1000)
         self.screen_width = int(window_dimensions[0])
         self.screen_height = int(window_dimensions[1])
         #self.screen_width = int(self.UI_PORTION * self.screen_width)
@@ -78,19 +87,14 @@ class ShipModel(Model):
             self.rooms.append([])
         
         # establish the room connections
-        self.corridors[0] = [2]
-        self.corridors[1] = [2, 4]
-        self.corridors[2] = [0, 1, 3, 5]
-        self.corridors[3] = [2, 6]
-        self.corridors[4] = [1, 5, 7, 11]
-        self.corridors[5] = [2, 4, 6, 8]
-        self.corridors[6] = [3, 5, 9, 12]
-        self.corridors[7] = [4, 8]
-        self.corridors[8] = [5, 7, 9, 10]
-        self.corridors[9] = [6, 8]
-        self.corridors[10] = [8]
-        self.corridors[11] = [4]
-        self.corridors[12] = [6]
+        self.corridors[0] = [1, 2]
+        self.corridors[1] = [0, 2, 3, 5]
+        self.corridors[2] = [0, 1, 4, 6]
+        self.corridors[3] = [1, 4, 7]
+        self.corridors[4] = [2, 3, 6, 7]
+        self.corridors[5] = [1, 3]
+        self.corridors[6] = [2, 4]
+        self.corridors[7] = [3, 4]
 
     # initialize rooms, targets and knowledge
     def init_game(self):
@@ -261,10 +265,17 @@ class ShipModel(Model):
         self.draw_knowledge(screen)
 
     def draw_controls(self, screen):
-        screen.fill([0, 0, 0], self.control_rect)
-        screen.fill([0, 255, 0], self.start_rect)
-        screen.fill([255, 0, 0], self.pause_rect)
-        screen.fill([0, 0, 255], self.step_rect)
+        screen.fill([220, 220, 220], self.control_rect)
+        # screen.fill([220, 220, 220], self.start_rect)
+        # screen.fill([220, 220, 220], self.pause_rect)
+        # screen.fill([220, 220, 220], self.step_rect)
+        pygame.draw.rect(screen, [200,200,200], self.start_rect, 5)
+        pygame.draw.rect(screen, [200,200,200], self.pause_rect, 5)
+        pygame.draw.rect(screen, [200,200,200], self.step_rect, 5)
+
+        screen.blit(self.text.render("Play", True, [255, 255, 255]), (self.start_rect.x+(self.start_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Pause", True, [255, 255, 255]), (self.pause_rect.x+(self.pause_rect.w/2)-20, 40))
+        screen.blit(self.text.render("Next", True, [255, 255, 255]), (self.step_rect.x+(self.step_rect.w/2)-20, 40))
 
     def draw_level(self, screen):
         screen.fill([255, 255, 255], self.game_rect)
@@ -274,12 +285,13 @@ class ShipModel(Model):
         #draw rooms and agents in rooms
         for idx, room in enumerate(self.rooms):
             location = self.roomlocations[idx]
-            # draw room
-
-            agents = len(room)
+            room_agents = []
             for agent in room:
-                # draw agentnumbers under room
-                pass
+                room_agents.append(agent.unique_id)
+
+            rect = Rect(location[0], location[1], 100, 30)
+            pygame.draw.rect(screen, [200, 200, 200], rect)
+            screen.blit(self.small_text.render(str(room_agents), True, [0, 0, 0]), (rect.x+5, rect.y+5))
 
         for idx, corridor in enumerate(self.corridors):
             roomlocation = self.roomlocations[idx]
@@ -368,12 +380,12 @@ class ShipModel(Model):
 if __name__ == '__main__':
     try:
         n = int(sys.argv[1])
-        if (n > 3 and n < 6):
-            game = ShipModel(n)
-            game.run()
-            sys.exit()
-        else:
-            print("Input 4 or 5 agents")
     except:
         print("Give the amount of agents as an integer")
+    if (n > 3 and n < 6):
+        game = ShipModel(n)
+        game.run()
+        sys.exit()
+    else:
+        print("Input 4 or 5 agents")
     
