@@ -103,6 +103,7 @@ class Person(Agent):
             room = self.model.rooms[self.position]
             # remember the roommates
             self.roommates = room[:]
+            print("Roommates: ", self.roommates)
             # remove self from roommates
             #print(room, self.position)
             self.roommates.remove(self)
