@@ -1,3 +1,5 @@
+Authors: Jasper Krebbers, Paul Ozkohen, Jelle Visser
+
 Introduction
 ============
 
